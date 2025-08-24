@@ -1,7 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## SharedCryptNote
+SharedCryptNote is a secure, web-based encrypted note-taking application. It uses the Blowfish encryption algorithm to securely store your notes and manages them efficiently within a file system. It is also compatible with the Android application "SharedKeyMemo," ensuring a seamless note-taking experience across your devices.
+
+## Key Features
+Strong Encryption
+
+Uses the Blowfish algorithm to keep your notes safe and secure.
+
+Google Account Integration
+
+Easily log in using your existing Google account.
+
+Git Version Control
+
+Each note is managed with Git, allowing you to track changes and revert to previous versions.
+
+Multi-Device Compatibility
+
+Compatible with the Android app SharedKeyMemo, enabling you to share and edit the same notes between your PC and smartphone.
+
+Tech Stack
+Frontend: Next.js
+
+Encryption: Blowfish
+
+Version Control: Git
+
+Authentication: Google Account Integration
+
+## Google AUTH
+.env.local
+```bash
+# NextAuth.js のセッションを暗号化するための秘密鍵です。任意の文字列で構いません。
+NEXTAUTH_SECRET=UUID
+
+# Google Cloud Platform で取得した Client ID
+GOOGLE_CLIENT_ID=
+
+# Google Cloud Platform で取得した Client Secret
+GOOGLE_CLIENT_SECRET=
+
+# Callback URL (http://localhost:3000/api/auth/callback/google)
+NEXTAUTH_URL=https://sharednote.hoge.com
+```
 
 ## Getting Started
-
 First, run the development server:
 
 ```bash
