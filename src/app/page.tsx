@@ -27,6 +27,7 @@ import { useHandleFileDelete } from '@/hooks/handleFileDelete';
 import { useHandleRepoDelete } from '@/hooks/handleRepoDelete';
 import Image from 'next/image';
 import { useHandleGitFetch } from '@/hooks/handleGitFetch';
+import { useHandleFileReset } from '@/hooks/handleFileReset';
 
 
 export default function Home() {
@@ -168,6 +169,29 @@ export default function Home() {
     }
     return fileicon;
   }
+  const handleIsModify = (gitstatuslist:{path:string,index:string,working_dir:string}[], entry:{ name: string; isDirectory: boolean }) : boolean => {
+    if(entry.isDirectory == true) {
+
+      //サブディレクトリに変化がある場合
+      if (gitstatuslist.length > 0) {
+        const fullpath = path.join(currentPath, entry.name);
+        const status = gitstatuslist.find(file => file.path.startsWith(fullpath));
+        if (status ) {
+          return true; // 変更があるサブディレクトリ
+        }
+      }
+      return false;
+    }
+
+    if (gitstatuslist.length > 0 ) {
+      const fullpath = path.join(currentPath, entry.name);
+      const status = gitstatuslist.find(file => file.path === fullpath);
+      if (status ) {
+        return true;
+      }
+    }
+    return false;
+  }
   const handleGitReset = useHandleGitReset(setLoading,setMessage, () => {
     setMessage('リセットしました。');
     if(selectRepo)
@@ -215,6 +239,12 @@ export default function Home() {
   });
   const handleFileDelete = useHandleFileDelete(setMessage, setLoading, () => {
     setMessage('削除しました。');
+    if(selectRepo) {
+      handleRepoFilelist(selectRepo, currentPath);
+    }
+  });
+  const handleFileReset = useHandleFileReset(setMessage, setLoading, () => {
+    setMessage('戻しました。');
     if(selectRepo) {
       handleRepoFilelist(selectRepo, currentPath);
     }
@@ -291,7 +321,7 @@ export default function Home() {
                     disabled={loading}
                     className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-900 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
                   >
-                    リセット
+                    戻す
                   </button>
 
                 {/* コミット */}
@@ -300,7 +330,7 @@ export default function Home() {
                     disabled={loading || commitmessage.length == 0 }
                     className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-900 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
                   >
-                    コミット
+                    保存
                   </button>
                 </div>
               ) : (
@@ -403,7 +433,7 @@ export default function Home() {
                           onClick={() =>{ if (!loading) handleFilegoup();}}
                           className="flex items-center space-x-3 p-2 rounded-md cursor-pointer hover:bg-gray-700 transition-colors duration-150"
                         >
-                          <span className="text-yellow-400">↩️</span>
+                          <span className="text-yellow-400">🔼</span>
                           <span className="text-white">..</span>
                         </li>
                         ) : ( null ) 
@@ -431,10 +461,11 @@ export default function Home() {
                               </span>
 
                               <div className="flex items-center space-x-2 ml-auto">
+
                                 { entry.isDirectory == false ? (
                                   isChiFile(entry) ? (
                                 <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                        disabled={password.length < 5}
+                                        disabled={loading || password.length < 5}
                                         title={ password.length < 5 ? "パスワードを入力して下さい":`${entry.name}を復号化`}
                                         onClick={() => {
                                           handleDecrypt( selectRepo,currentPath,entry.name,password);
@@ -450,6 +481,16 @@ export default function Home() {
                                   🔒
                                 </button>)
                                 ):(null)}
+                                { handleIsModify(gitStatusList,entry) ? (
+                                  <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
+                                        disabled={loading}
+                                        title={ `${entry.name}を戻す`}
+                                        onClick={() => {
+                                          handleFileReset( selectRepo,currentPath,entry.name);
+                                          }}>
+                                    ↩️
+                                  </button>
+                                  ):(null) }
                                 <button
                                   className="text-red-500 hover:text-red-700 justify-end"
                                   disabled={loading}
