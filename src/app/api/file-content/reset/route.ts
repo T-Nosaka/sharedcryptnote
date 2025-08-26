@@ -46,10 +46,11 @@ export async function POST(req: NextRequest) {
     // ファイルが存在し、ファイルであることを確認
     const stats = await fs.stat(absoluteFilePath);
     if (stats.isFile()) {
+        await fs.unlink(absoluteFilePath);
         await gitinfo.FileReset(absoluteFilePath);
     } else {
         await fs.rmdir( absoluteFilePath, { recursive: true });
-        await gitinfo.DirectoryReset(absoluteFilePath);
+        await gitinfo.FileReset(absoluteFilePath);
     }
 
     return NextResponse.json({ message: 'File reset successfully' }, { status: 200 });

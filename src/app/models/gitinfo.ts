@@ -190,26 +190,7 @@ export class GitInfo {
             };
             const git: SimpleGit = simpleGit(options);
 
-            // git checkout -- <filepath> を実行してファイルをリセット
-            await git.checkout(['--', filepath]);
-        } catch (error) {
-            console.error('Error during git file reset:', error);
-            throw error;
-        }
-    }
-
-    /*
-     * Git DirectoryReset
-     */
-    async DirectoryReset( filepath: string ): Promise<void> {
-        try {
-            const options: Partial<SimpleGitOptions> = {
-                baseDir: this.baseDir(),
-            };
-            const git: SimpleGit = simpleGit(options);
-
             await git.reset(['--', filepath]);
-
             const status = await git.status([filepath]);
             const changedFiles = status.files;
             if (changedFiles.length > 0)
@@ -218,7 +199,7 @@ export class GitInfo {
             console.error('Error during git file reset:', error);
             throw error;
         }
-    }   
+    }
 
     /*
      * Git Commit
