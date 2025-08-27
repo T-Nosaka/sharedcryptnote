@@ -93,6 +93,7 @@ export class GitInfo {
             timeout: {
                 block: 20000,
             },
+            config: ['pull.rebase', 'true']
         };
         if( sshkey != undefined ) {
             options.config = [
@@ -111,6 +112,8 @@ export class GitInfo {
             if( sshkey != undefined ) {
                 newinstance.sshkey = sshkey;
             }
+            await newinstance.SetPullConfig();
+
             return newinstance;
         } catch (error) {
             console.error('Error during git clone:', error);
@@ -128,6 +131,23 @@ export class GitInfo {
      */
     baseDir(): string {
         return path.join(this.basepath, this.name);
+    }
+
+    /*
+     * PULL設定
+     */
+    async SetPullConfig() : Promise<void> {
+
+        try {
+            const options: Partial<SimpleGitOptions> = {
+                baseDir: this.baseDir(),
+            };
+            const git: SimpleGit = simpleGit(options);
+            git.addConfig('pull.rebase', 'true');
+
+        } catch (err) {
+            console.error('エラー:', err);
+        }
     }
 
     /*

@@ -32,7 +32,16 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error('Error during git pull:', error);
-    return NextResponse.json({ error: 'Failed to pull repository' }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+
+    // コンフリクトエラーかどうかを判定
+    if (message.includes('reconcile divergent') ) {
+      return NextResponse.json({ 
+        error: 'コンフリクトが発生しました。ローカルの変更を「戻す」ボタンでリセットしてください。',
+        code: 'PULL_CONFLICT' 
+      }, { status: 409 }); // 409 Conflict
+    }
+
+    return NextResponse.json({ error: `Failed to pull repository. ${message}` }, { status: 500 });
   }
 }
-

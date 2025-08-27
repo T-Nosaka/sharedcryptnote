@@ -208,10 +208,13 @@ export default function Home() {
     if(selectRepo)
       handleGitStatus(selectRepo);
   });
-  const handleGitPull = useHandleGitPull(setLoading,setMessage, () => {
-    setMessage('プルしました。');
-    if(selectRepo)
-      handleGitStatus(selectRepo);
+  const handleGitPull = useHandleGitPull(setLoading,setMessage, {
+    onSuccess: () => {
+      setMessage('プルしました。');
+    },
+    onConflict: () => {
+//      if(selectRepo) handleGitStatus(selectRepo);
+    }
   });
   const handleGitFetch = useHandleGitFetch(setLoading,setMessage, () => {
     setMessage('フェッチしました。');

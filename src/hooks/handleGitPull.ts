@@ -5,7 +5,10 @@
 export function useHandleGitPull( 
   setLoading: ( status:boolean) => void, 
   setMessage: (str: string) => void,
-  callback?: () => void  ) {
+  callbacks?: {
+    onSuccess?: () => void;
+    onConflict?: () => void;
+  }) {
   return async ( gitinfostr:string ) => {
     setLoading(true);
     setMessage('');
@@ -17,12 +20,14 @@ export function useHandleGitPull(
       });
       const data = await response.json();
       if (response.ok) {
-        if (callback) {
-          callback();
+        callbacks?.onSuccess?.();
+      } else
+        if (response.status == 409) {
+          setMessage(`Error: ${data.error}`);
+          callbacks?.onConflict?.();
+        } else {
+          setMessage(`Error: ${data.error}`);
         }
-      } else {
-        setMessage(`Error: ${data.error}`);
-      }
     } catch (error) {
       setMessage('An unexpected error occurred.');
       console.error(error);
@@ -31,4 +36,3 @@ export function useHandleGitPull(
     }
   };
 }
-
