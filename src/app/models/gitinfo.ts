@@ -80,7 +80,7 @@ export class GitInfo {
     /*
      * Clone
      */
-    static async clone( basepath: string, url: string, name:string, sshkey?: string ) : Promise<GitInfo | null> {
+    static async clone( basepath: string, url: string, name:string, email:string, sshkey?: string ) : Promise<GitInfo | null> {
 
         // Gitリポジトリ作成
         try {
@@ -122,7 +122,7 @@ export class GitInfo {
             if( sshkey != undefined ) {
                 newinstance.sshkey = sshkey;
             }
-            await newinstance.SetPullConfig();
+            await newinstance.SetBasicConfig(email);
 
             return newinstance;
         } catch (error) {
@@ -144,16 +144,19 @@ export class GitInfo {
     }
 
     /*
-     * PULL設定
+     * 基本設定
      */
-    async SetPullConfig() : Promise<void> {
+    async SetBasicConfig(email:string) : Promise<void> {
 
         try {
             const options: Partial<SimpleGitOptions> = {
                 baseDir: this.baseDir(),
             };
             const git: SimpleGit = simpleGit(options);
-            git.addConfig('pull.rebase', 'true');
+            await git.addConfig('pull.rebase', 'true');
+
+            const originalEmail = await git.getConfig('user.email', 'local');
+            await git.addConfig('user.email', email, true, 'worktree');
 
         } catch (err) {
             console.error('エラー:', err);

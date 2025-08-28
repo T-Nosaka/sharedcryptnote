@@ -109,7 +109,7 @@ export class UserInfo {
      */
     async gitclone(url: string, name:string, sshkey?: string): Promise<boolean> {
         // GitInfoのcloneメソッドを呼び出す
-        const result = await GitInfo.clone( await this.gitBaseDir(), url, name, sshkey);
+        const result = await GitInfo.clone( await this.gitBaseDir(), url, name, this.email, sshkey);
         if( result == null ) {
             return false;
         }
