@@ -1,4 +1,4 @@
-import { RemoteWithoutRefs, ResetMode, simpleGit, SimpleGit, SimpleGitOptions } from 'simple-git';
+import { ResetMode, simpleGit, SimpleGit, SimpleGitOptions } from 'simple-git';
 
 import fs from 'fs/promises';
 import { writeFile } from 'fs/promises';
@@ -14,6 +14,16 @@ export interface Repo {
   name: string;
   encoding: string;
   sshkey?: string;
+}
+
+/*
+ * ステータスインターフェース
+ */
+export interface StatusReulst {
+    changedFiles: { path: string; index: string, working_dir: string }[];
+    branch: string;
+    ahead: number;
+    behind: number;
 }
 
 /*
@@ -153,10 +163,9 @@ export class GitInfo {
     /*
      * 差分取得
      */
-    async getChangedFiles() : Promise<{ changedFiles: { path: string; working_dir: string }[]; ahead: number; behind: number }> {
+    async getChangedFiles() : Promise<StatusReulst> {
 
-        type ChangedFile = { path: string; index: string; working_dir: string };
-        const result = { changedFiles: [] as ChangedFile[], ahead: 0, behind: 0 };
+        const result : StatusReulst = { changedFiles : [], branch: '', ahead: 0, behind: 0 };
 
         try {
             const options: Partial<SimpleGitOptions> = {
@@ -166,6 +175,7 @@ export class GitInfo {
 
             // git status を実行し、リポジトリの状態を取得
             const status = await git.status();
+            const brresult = await git.branch();
 
             // 差分のあるファイル（変更済み、追加済み、削除済み）のリストを取得
             const changedFiles = status.files
@@ -175,12 +185,32 @@ export class GitInfo {
             result.changedFiles = changedFiles;
             result.ahead = status.ahead;
             result.behind = status.behind;
+            result.branch = brresult.current;
+
             return result;
         } catch (err) {
             console.error('エラー:', err);
             return result;
         }
     }
+
+    /*
+     * Git Rebase continue
+     */
+    async RebaseContinue() : Promise<void> {
+        try {
+            const options: Partial<SimpleGitOptions> = {
+                baseDir: this.baseDir(),
+            };
+            const git: SimpleGit = simpleGit(options);
+
+            // git rebase --continue を実行
+            await git.rebase(['--continue']);
+        } catch (error) {
+            console.error('Error during git rebase continue:', error);
+            throw error;
+        }
+    }               
 
     /*
      * Git Reset

@@ -12,7 +12,7 @@ import { useHandleFileGoup } from '@/hooks/handleFileGoup';
 import { editableExtensions, supportedEncodings, encryptExtensions } from './utils/constants';
 import { handleFileGet } from '@/hooks/handleFileGet';
 import { useHandleSetEncode } from '@/hooks/handleSetEncode';
-import { Repo } from './models/gitinfo';
+import { Repo, StatusReulst } from './models/gitinfo';
 import { useHandleFilePut } from '@/hooks/handleFilePut';
 import { useHandleGitStatus } from '@/hooks/handleGitStatus';
 import path from 'path';
@@ -28,6 +28,7 @@ import { useHandleRepoDelete } from '@/hooks/handleRepoDelete';
 import Image from 'next/image';
 import { useHandleGitFetch } from '@/hooks/handleGitFetch';
 import { useHandleFileReset } from '@/hooks/handleFileReset';
+import { useHandleGitRebase } from '@/hooks/handleRebase';
 
 
 export default function Home() {
@@ -50,15 +51,17 @@ export default function Home() {
   const [gitStatusBehind, setGitStatusBehind] = useState<number>(0);
   const [commitmessage, setCommitMessage] = useState<string>('');
   const [newFileName, setNewFileName] = useState<string>('');
+  const [gitBranch, setGitBranch] = useState<string>('');
 
   let repo: Repo | undefined;
   if(selectRepo) {
     repo = JSON.parse(selectRepo) as Repo;
   }
-  const handleGitStatus = useHandleGitStatus(setLoading,setMessage,( status:{path:string,index:string,working_dir:string}[], ahead:number,behind:number )=>{
-    setGitStatusList(status);
-    setGitStatusAhead(ahead);
-    setGitStatusBehind(behind);
+  const handleGitStatus = useHandleGitStatus(setLoading,setMessage,( status: StatusReulst ) =>{
+    setGitStatusList(status.changedFiles);
+    setGitStatusAhead(status.ahead);
+    setGitStatusBehind(status.behind);
+    setGitBranch(status.branch);
   });
 
   const handleRepoFilelist = useHandleRepofilelist(setFileList, setLoading, setMessage, async (gitinfostr) => {
@@ -197,6 +200,11 @@ export default function Home() {
     if(selectRepo)
       handleRepoFilelist(selectRepo,currentPath);
   } );
+  const handleGitRebase = useHandleGitRebase(setLoading,setMessage, () => {
+    setMessage('リベースしました。');
+    if(selectRepo)
+      handleRepoFilelist(selectRepo,currentPath);
+  } );
   const handleGitCommit = useHandleGitCommit(setLoading,setMessage, () => {
     setMessage('コミットしました。');
     setCommitMessage('');    
@@ -300,6 +308,7 @@ export default function Home() {
 
             <div className="mt-4 p-6 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
               <h2 className="text-2xl font-semibold mb-4 text-blue-300">📕{repo?.name}</h2>
+              <p>{"ブランチ: "+gitBranch}</p>
               <p>{"同期状況: "+gitStatusAhead+"進み "+gitStatusBehind+"遅れ"}</p>
               {gitStatusList.length > 0 ? (
                 <div>
@@ -316,6 +325,20 @@ export default function Home() {
                 ):(null)}
 
               <div className="mt-4 p-6 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
+                
+                {gitBranch == "(no" && gitStatusList.length == 0 ? (
+                  <div>
+                  {/* リベース */}
+                    <button
+                      onClick={() => handleGitRebase(selectRepo)}
+                      disabled={loading}
+                      className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-blue-900 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+                    >
+                      解決
+                    </button>
+                  </div>
+                  ):(null)}
+
                 {gitStatusList.length > 0 ? (
                 <div>
                 {/* リセット */}

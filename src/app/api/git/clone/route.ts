@@ -36,7 +36,9 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error('Error during git clone:', error);
-    return NextResponse.json({ error: 'Failed to clone repository' }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+
+    return NextResponse.json({ error: `Failed to clone repository. ${message}` }, { status: 500 });
   }
 }
 

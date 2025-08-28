@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Error during git push:', error);
     const message = error instanceof Error ? error.message : String(error);
+    
     return NextResponse.json({ error: `Failed to push repository. ${message}` }, { status: 500 });
   }
 }

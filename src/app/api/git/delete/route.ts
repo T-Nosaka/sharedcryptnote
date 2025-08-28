@@ -33,11 +33,13 @@ export async function POST(req: NextRequest) {
  
     await userinfo.deleteGitInfo(gitinfo);
 
-    return NextResponse.json({ message: 'Repository commit successfully!' });
+    return NextResponse.json({ message: 'Repository delete successfully!' });
 
   } catch (error) {
-    console.error('Error during git commit:', error);
-    return NextResponse.json({ error: 'Failed to commit repository' }, { status: 500 });
+    console.error('Error during git delete:', error);
+    const message = error instanceof Error ? error.message : String(error);
+
+    return NextResponse.json({ error: `Failed to delete repository. ${message}` }, { status: 500 });
   }
 }
 

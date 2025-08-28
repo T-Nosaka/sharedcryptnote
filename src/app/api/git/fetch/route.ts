@@ -32,7 +32,9 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error('Error during git fetch:', error);
-    return NextResponse.json({ error: 'Failed to fetch repository' }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+
+    return NextResponse.json({ error: `Failed to fetch repository. ${message}` }, { status: 500 });
   }
 }
 

@@ -4,7 +4,7 @@ import { authOptions } from '@/app/lib/auth';
 import { getServerSession } from 'next-auth';
 
 /*
- * Git Reset ハンドラ
+ * Git Rebase ハンドラ
  */
 export async function POST(req: NextRequest) {
   try {
@@ -26,15 +26,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'gitinfo is required' }, { status: 400 });
     }
  
-    await gitinfo?.ResetHard();
+    await gitinfo?.RebaseContinue();
 
-    return NextResponse.json({ message: 'Repository reset successfully!' });
+    return NextResponse.json({ message: 'Repository rebase successfully!' });
 
   } catch (error) {
-    console.error('Error during git reset:', error);
+    console.error('Error during git rebase:', error);
     const message = error instanceof Error ? error.message : String(error);
 
-    return NextResponse.json({ error: `Failed to reset repository. ${message}` }, { status: 500 });
+    return NextResponse.json({ error: `Failed to rebase repository. ${message}` }, { status: 500 });
   }
 }
 

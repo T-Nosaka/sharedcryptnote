@@ -28,11 +28,15 @@ export async function POST(req: NextRequest) {
  
     const statusresult = await gitinfo?.getChangedFiles();
 
-    return NextResponse.json({ status:statusresult.changedFiles, ahead:statusresult.ahead, behind:statusresult.behind, message: 'Repository status successfully!' });
+    console.log(statusresult);
+
+    return NextResponse.json({ status:statusresult, message: 'Repository status successfully!' });
 
   } catch (error) {
     console.error('Error during git status:', error);
-    return NextResponse.json({ error: 'Failed to status repository' }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+
+    return NextResponse.json({ error: `Failed to status repository. ${message}` }, { status: 500 });
   }
 }
 

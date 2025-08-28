@@ -32,7 +32,9 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error('Error during git commit:', error);
-    return NextResponse.json({ error: 'Failed to commit repository' }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+
+    return NextResponse.json({ error: `Failed to commit repository. ${message}` }, { status: 500 });
   }
 }
 

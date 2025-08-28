@@ -1,26 +1,24 @@
-import { StatusReulst } from "@/app/models/gitinfo";
 
 /*
- * Git Status
+ * Git Rebase
  */
-export function useHandleGitStatus( 
+export function useHandleGitRebase( 
   setLoading: ( status:boolean) => void, 
   setMessage: (str: string) => void,
-  callback?: ( status: StatusReulst ) => void  ) {
+  callback?: () => void  ) {
   return async ( gitinfostr:string ) => {
     setLoading(true);
     setMessage('');
     try {
-      const response = await fetch('/api/git/status', {
+      const response = await fetch('/api/git/rebase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ gitinfostr: gitinfostr }),
       });
       const data = await response.json();
       if (response.ok) {
-        const status = data.status as StatusReulst;
         if (callback) {
-          callback(status);
+          callback();
         }
       } else {
         setMessage(`Error: ${data.error}`);
