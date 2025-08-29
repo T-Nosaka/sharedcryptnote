@@ -29,6 +29,7 @@ import Image from 'next/image';
 import { useHandleGitFetch } from '@/hooks/handleGitFetch';
 import { useHandleFileReset } from '@/hooks/handleFileReset';
 import { useHandleGitRebase } from '@/hooks/handleRebase';
+import { AppContents } from './components/appcontents';
 
 
 export default function Home() {
@@ -278,15 +279,7 @@ export default function Home() {
   if (status === 'authenticated' ) {
 
     return (
-
-      <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-24 bg-gray-900 text-white">
-
-        <div className="z-10 w-full md:max-w-5xl items-center justify-between font-mono text-sm lg:flex" style={{maxWidth:600}}>
-          <div className="flex items-center">
-            <Image src="/icon.png" alt="icon" width={48} height={48} className="mb-8 ml-4" />
-            <h1 className="text-4xl font-bold mb-8 text-blue-400">shared crypt note</h1>
-          </div>
-        </div>
+      <AppContents>
 
         <div className="flex items-center space-x-4 mb-8">
           <h1>{session.user?.name}</h1>
@@ -667,26 +660,19 @@ export default function Home() {
             </div>
           )}
         </div>
-        <footer className="flex mt-16 text-gray-500 text-sm">
-          <Image src="/dangerouswoo.png" alt="icon" width={16} height={16} className="mr-3 mb-8 ml-4" />
-          Designed By DangerousWOO
-        </footer>
-      </main>
+      </AppContents>        
     );
   }
   if (status === 'loading') {
     return (
-      <div>Loading...</div>
+      <AppContents>
+        <div>Loading...</div>
+      </AppContents>
     );
   }
 
-  return (
-
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-24 bg-gray-900 text-white">
-      <div className="flex items-center">
-        <Image src="/icon.png" alt="icon" width={48} height={48} className="mb-8 ml-4" />
-        <h1 className="text-4xl font-bold mb-8 text-blue-400">shared crypt note</h1>
-      </div>
+  return ( 
+    <AppContents>
       <button
         onClick={() => signIn("google")}
         className="flex items-center justify-center px-4 py-2 mt-4 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500"
@@ -700,10 +686,6 @@ export default function Home() {
         </svg>
         <span>Googleでサインイン</span>
       </button>
-      <footer className="flex mt-16 text-gray-500 text-sm">
-        <Image src="/dangerouswoo.png" alt="icon" width={16} height={16} className="mr-3 mb-8 ml-4" />
-        Designed By DangerousWOO
-      </footer>
-    </main>
+    </AppContents>
   );
 }
