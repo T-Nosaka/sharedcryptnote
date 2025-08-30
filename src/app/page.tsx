@@ -31,6 +31,7 @@ import { useHandleFileReset } from '@/hooks/handleFileReset';
 import { useHandleGitRebase } from '@/hooks/handleRebase';
 import { AppContents } from './components/appcontents';
 import { RepositorySection } from './components/repositorysection';
+import { RepositoryState } from './components/repositorystate';
 
 
 export default function Home() {
@@ -300,85 +301,24 @@ export default function Home() {
         { selectRepo ? (
           <div className="w-full" style={{maxWidth:600}}>
 
-            <div className="mt-4 p-6 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
-              <h2 className="text-2xl font-semibold mb-4 text-blue-300">📕{repo?.name}</h2>
-              <p>{"ブランチ: "+gitBranch}</p>
-              <p>{"同期状況: "+gitStatusAhead+"進み "+gitStatusBehind+"遅れ"}</p>
-              {gitStatusList.length > 0 ? (
-                <div>
-                  <p>{"変更:"+gitStatusList.length + "ファイル"}</p>
-                  <input
-                    type="text"
-                    value={commitmessage}
-                    onChange={(e) => setCommitMessage(e.target.value)}
-                    placeholder="commitメッセージ"
-                    className="flex-grow w-full p-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={loading} 
-                  />
-                </div>
-                ):(null)}
+            <RepositoryState
+              loading={loading}
+              repo={repo}
+              selectRepo={selectRepo}
+              gitBranch={gitBranch}
+              gitStatusAhead={gitStatusAhead}
+              gitStatusBehind={gitStatusBehind}
+              gitStatusList={gitStatusList}
+              commitmessage={commitmessage}
+              setCommitMessage={setCommitMessage}
+              handleGitReset={handleGitReset}
+              handleGitCommit={handleGitCommit}
+              handleGitPush={handleGitPush}
+              handleGitPull={handleGitPull}
+              handleGitRebase={handleGitRebase}
+            />
 
-              <div className="mt-4 p-6 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
-                
-                {gitBranch == "(no" && gitStatusList.length == 0 ? (
-                  <div>
-                  {/* リベース */}
-                    <button
-                      onClick={() => handleGitRebase(selectRepo)}
-                      disabled={loading}
-                      className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-blue-900 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                    >
-                      解決
-                    </button>
-                  </div>
-                  ):(null)}
-
-                {gitStatusList.length > 0 ? (
-                <div>
-                {/* リセット */}
-                  <button
-                    onClick={() => handleGitReset(selectRepo)}
-                    disabled={loading}
-                    className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-900 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                  >
-                    戻す
-                  </button>
-
-                {/* コミット */}
-                  <button
-                    onClick={() => handleGitCommit( selectRepo, commitmessage )}
-                    disabled={loading || commitmessage.length == 0 }
-                    className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-900 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                  >
-                    保存
-                  </button>
-                </div>
-              ) : (
-                <div>
-                {/* PUSH */}
-                  <button
-                    onClick={() => handleGitPush( selectRepo )}
-                    disabled={loading || gitStatusAhead == 0}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-900 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                  >
-                    📕➡︎☁️
-                  </button>
-                {/* PULL */}
-                  <button
-                    onClick={() => handleGitPull( selectRepo )}
-                    disabled={loading || gitStatusBehind == 0}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-900 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                  >
-                    ☁️➡︎📕
-                  </button>
-                </div>
-              )}
-
-            </div>
-
-            </div>
             <div className="mt-4 p-1 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
-              {/* リポジトリ情報 */}
 
               {/* 文字コード選択ドロップダウン */}
               <label htmlFor="encoding-select" className="block text-sm font-medium text-gray-400 mb-1">
