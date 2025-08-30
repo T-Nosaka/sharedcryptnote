@@ -298,6 +298,14 @@ export default function Home() {
           {loading ? '⏳' : null }
         </div>
 
+        <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
+          {message && (
+            <div className={`mt-4 p-3 rounded-md ${message.startsWith('Error') ? 'bg-red-800' : 'bg-green-800'} text-white text-sm`}>
+              <p>{message}</p>
+            </div>
+          )}
+        </div>
+
         { selectRepo ? (
           <div className="w-full" style={{maxWidth:600}}>
 
@@ -317,6 +325,41 @@ export default function Home() {
               handleGitPull={handleGitPull}
               handleGitRebase={handleGitRebase}
             />
+
+            {editingFilePath!=undefined ? ( 
+            <div className="mt-4 p-1 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
+
+              {/*ファイル編集*/}
+
+              <label htmlFor="encoding-select" className="block text-sm font-medium text-gray-400 mb-1">
+              {editingFilePath}              
+              </label>
+
+              <div className="mt-4 p-0 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
+                <textarea
+                  className="w-full h-80 p-0 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                  value={selectedFileContent}
+                  onChange={(e) => setSelectedFileContent(e.target.value)}
+                  placeholder="ファイルの内容を入力..."
+                ></textarea>
+                <button
+                  onClick={() => handleSaveFile(selectRepo,fileEncoding,editingFilePath,selectedFileContent,password)}
+                  disabled={loading}
+                  className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? '保存中...' : '保存'}
+                </button>
+                <button
+                  onClick={handleCancelEdit}
+                  disabled={loading}
+                  className="w-full sm:w-auto px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+                >
+                  キャンセル
+                </button>
+              </div>
+            </div>
+
+            ) : (
 
             <div className="mt-4 p-1 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
 
@@ -350,34 +393,9 @@ export default function Home() {
                 disabled={loading}
               />
 
-            {editingFilePath!=undefined ? ( 
-              //ファイル編集
-              <div className="mt-4 p-0 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
-                <textarea
-                  className="w-full h-80 p-0 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                  value={selectedFileContent}
-                  onChange={(e) => setSelectedFileContent(e.target.value)}
-                  placeholder="ファイルの内容を入力..."
-                ></textarea>
-                <button
-                  onClick={() => handleSaveFile(selectRepo,fileEncoding,editingFilePath,selectedFileContent,password)}
-                  disabled={loading}
-                  className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                >
-                  {loading ? '保存中...' : '保存'}
-                </button>
-                <button
-                  onClick={handleCancelEdit}
-                  disabled={loading}
-                  className="w-full sm:w-auto px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                >
-                  キャンセル
-                </button>
-              </div>
-
-            ) : (
-              //ファイル一覧
+              {/*ファイル一覧*/}
               <div className="flex flex-col items-center space-y-4 mb-4 w-full max-w-xl" style={{maxWidth:600}}>
+
                 <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4 w-full max-w-xl" style={{maxWidth:600}}>
                   <div className="mt-4 p-6 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
 
@@ -502,9 +520,10 @@ export default function Home() {
                   ⏏️ Go back
                 </button>
               </div>
+            </div>
+
             )}
             </div>
-          </div>
 
         ) : (
            /* リポジトリ一覧 */
@@ -524,13 +543,6 @@ export default function Home() {
 
         )}
 
-        <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
-          {message && (
-            <div className={`mt-4 p-3 rounded-md ${message.startsWith('Error') ? 'bg-red-800' : 'bg-green-800'} text-white text-sm`}>
-              <p>{message}</p>
-            </div>
-          )}
-        </div>
       </AppContents>        
     );
   }
