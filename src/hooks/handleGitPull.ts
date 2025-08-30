@@ -7,7 +7,7 @@ export function useHandleGitPull(
   setMessage: (str: string) => void,
   callbacks?: {
     onSuccess?: () => void;
-    onConflict?: () => void;
+    onProbrem?: (status:number) => void;
   }) {
   return async ( gitinfostr:string ) => {
     setLoading(true);
@@ -22,12 +22,8 @@ export function useHandleGitPull(
       if (response.ok) {
         callbacks?.onSuccess?.();
       } else
-        if (response.status == 409) {
-          setMessage(`Error: ${data.error}`);
-          callbacks?.onConflict?.();
-        } else {
-          setMessage(`Error: ${data.error}`);
-        }
+        callbacks?.onProbrem?.(response.status);
+        setMessage(`Error: ${data.error}`);
     } catch (error) {
       setMessage('An unexpected error occurred.');
       console.error(error);

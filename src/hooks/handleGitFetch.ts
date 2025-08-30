@@ -5,7 +5,7 @@
 export function useHandleGitFetch( 
   setLoading: ( status:boolean) => void, 
   setMessage: (str: string) => void,
-  callback?: () => void  ) {
+  callback?: (gitinfostr:string) => void  ) {
   return async ( gitinfostr:string ) => {
     setLoading(true);
     setMessage('');
@@ -18,7 +18,7 @@ export function useHandleGitFetch(
       const data = await response.json();
       if (response.ok) {
         if (callback) {
-          callback();
+          callback(gitinfostr);
         }
       } else {
         setMessage(`Error: ${data.error}`);
