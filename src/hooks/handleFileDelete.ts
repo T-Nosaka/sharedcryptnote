@@ -5,7 +5,7 @@ export const useHandleFileDelete = (
   setLoading: (loading: boolean) => void,
   callback?: () => void
 ) => {
-  const handleFileDelete = async (gitinfostr: string, currentPath: string, fileName: string) => {
+  return async (gitinfostr: string, currentPath: string, fileName: string) => {
     if (!window.confirm(`'${fileName}' を削除しますか？`)) {
       return;
     }
@@ -34,6 +34,4 @@ export const useHandleFileDelete = (
         setLoading(false);
     }
   };
-
-  return handleFileDelete;
 };
