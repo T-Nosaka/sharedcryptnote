@@ -411,4 +411,38 @@ export class GitInfo {
             throw error;
         }
     }
+
+    /*
+     * Git Checkout --ours
+     */
+    async CheckoutOurs( filepath: string ) : Promise<void> {
+        try {
+            const options: Partial<SimpleGitOptions> = {
+                baseDir: this.baseDir(),
+            };
+            const git: SimpleGit = simpleGit(options);
+
+            await git.checkout(['--ours', filepath]);
+        } catch (error) {
+            console.error('Error during git checkout:', error);
+            throw error;
+        }
+    }
+
+    /*
+     * Git Checkout --theirs
+     */
+    async CheckoutTheirs( filepath: string ) : Promise<void> {
+        try {
+            const options: Partial<SimpleGitOptions> = {
+                baseDir: this.baseDir(),
+            };
+            const git: SimpleGit = simpleGit(options);
+
+            await git.checkout(['--theirs', filepath]);
+        } catch (error) {
+            console.error('Error during git checkout:', error);
+            throw error;
+        }
+    }
 }

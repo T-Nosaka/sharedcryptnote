@@ -32,6 +32,7 @@ import { useHandleGitRebase } from '@/hooks/handleRebase';
 import { AppContents } from './components/appcontents';
 import { RepositorySection } from './components/repositorysection';
 import { RepositoryState } from './components/repositorystate';
+import { useHandleGitCheckoutFile } from '@/hooks/handleGitCheckoutfile';
 
 
 export default function Home() {
@@ -268,6 +269,9 @@ export default function Home() {
       handleRepoFilelist(selectRepo, currentPath);
     }
   });
+  const handleGitCheckoutFile = useHandleGitCheckoutFile( setMessage, setLoading, () => {
+    setMessage('checkoutしました。');
+  });
 
   const isChiFile = (entry:{ name: string; isDirectory: boolean }) => {
     if (entry.isDirectory==true)
@@ -477,6 +481,28 @@ export default function Home() {
                                         ↩️
                                       </button>
                                       ):(null) }
+
+                                    { gitBranch == "(no" && entry.isDirectory == false && handleIsModify(gitStatusList,entry) ? (
+                                      <div>
+                                        <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
+                                                disabled={loading }
+                                                title={ `${entry.name}を自分のファイルに更新`}
+                                                onClick={() => {
+                                                  handleGitCheckoutFile( selectRepo, 'theirs' , currentPath,entry.name);
+                                                  }}>
+                                          ◀
+                                        </button>
+                                        <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
+                                                disabled={loading }
+                                                title={ `${entry.name}を相手のファイルに更新`}
+                                                onClick={() => {
+                                                  handleGitCheckoutFile( selectRepo, 'ours' , currentPath,entry.name);
+                                                  }}>
+                                          ▶
+                                        </button>
+                                      </div>
+                                    ):(null)}
+
                                     <button
                                       className="text-red-500 hover:text-red-700 justify-end"
                                       disabled={loading}
