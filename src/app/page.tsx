@@ -70,7 +70,10 @@ export default function Home() {
   const handleRepoFilelist = useHandleRepofilelist(setFileList, setLoading, setMessage, async (gitinfostr) => {
     handleGitStatus(gitinfostr);
   });
-  const handleRepolist = useCallback(useHandleRepolist(setRepoList, setLoading, setMessage),[status]);
+  const handleRepolist = useHandleRepolist(setRepoList, setLoading, setMessage);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleRepolistOnes = useCallback<()=>Promise<void>>(handleRepolist, [session]);
+
   const handleRepoSelect = useHandleRepoSelect(setselectRepo, setMessage, (gitinfostr,encoding) => {
     handleGitFetch(gitinfostr);
     setFileEncoding(encoding);
@@ -276,9 +279,9 @@ export default function Home() {
   useEffect( () => {
     if (status === 'authenticated' ) {
       //リポジトリ一覧取得
-      handleRepolist();
+      handleRepolistOnes();
     }
-  }, [handleRepolist, status]); // fetchFileListが変更された場合のみ再実行 (useCallbackと組み合わせると事実上初回のみ)
+  }, [handleRepolistOnes, status]);
 
   if (status === 'authenticated' ) {
 
