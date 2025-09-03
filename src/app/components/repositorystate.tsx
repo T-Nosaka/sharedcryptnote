@@ -21,6 +21,7 @@ export function RepositoryState({
   handleGitPull,
   handleGitRebase,
   handleGitLog,
+  handleRepoExit,
 }: {
   loading: boolean;
   repo: Repo | undefined;
@@ -37,6 +38,7 @@ export function RepositoryState({
   handleGitPull: (gitinfostr:string) => void;
   handleGitRebase: (gitinfostr:string) => void;
   handleGitLog: (gitinfostr:string) => void;
+  handleRepoExit: () => void;
 }) {
   return (
 
@@ -118,10 +120,19 @@ export function RepositoryState({
                 disabled={loading}
                 className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
               >
-                ログ
+                変更履歴
               </button>              
 
             </div>
+
+            <button
+              onClick={() => handleRepoExit()}
+              className="w-full max-w-2xl px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+              style={{maxWidth:600}}
+            >
+              ⏏️ 戻る
+            </button>
+
           </div>    
   );
 }

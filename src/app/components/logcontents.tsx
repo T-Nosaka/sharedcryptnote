@@ -26,9 +26,9 @@ export function LogContents({
             <button
             onClick={() => setLoglist( undefined )}
             disabled={loading}
-            className="flex items-center justify-center px-4 py-2 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500"
+            className="w-full max-w-2xl px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
             >
-                <span>戻る</span>
+              ⏏️ 戻る
             </button>
 
             <table className="min-w-full border-collapse border border-gray-700">

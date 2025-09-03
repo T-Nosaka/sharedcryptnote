@@ -95,6 +95,13 @@ export default function Home() {
     setPassword('');
     setFileList([]);
     setCommitMessage('');
+    setNewFileName('');
+    setGitStatusList([]);
+    setGitStatusAhead(0);
+    setGitStatusBehind(0);
+    setGitBranch('');
+    setEditingFilePath(undefined);
+    setSelectedFileContent('');
   } );
   const handleRepoDelete = useHandleRepoDelete(setLoading,setMessage, () => {
     handleRepolist();
@@ -390,6 +397,7 @@ export default function Home() {
                       handleGitPull={handleGitPull}
                       handleGitRebase={handleGitRebase}
                       handleGitLog={handleGitLog}
+                      handleRepoExit={handleRepoExit}
                     />
 
                     <div className="mt-4 p-1 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
@@ -552,6 +560,7 @@ export default function Home() {
                           <button
                             onClick={() => handleNewFile( selectRepo, currentPath, newFileName, "file" )}
                             disabled={loading || newFileName.length == 0 }
+                            title={`${newFileName}.txt ファイルを作成`}
                             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex-shrink-0 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
                           >
                           +📄
@@ -559,19 +568,13 @@ export default function Home() {
                           <button
                             onClick={() => handleNewFile( selectRepo, currentPath, newFileName, "folder" )}
                             disabled={loading || newFileName.length == 0 }
+                            title={`${newFileName} フォルダを作成`}
                             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex-shrink-0 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
                           >
                           +📁
                           </button>
 
                         </div>
-                        <button
-                          onClick={() => handleRepoExit()}
-                          className="w-full max-w-2xl px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                          style={{maxWidth:600}}
-                        >
-                          ⏏️ Go back
-                        </button>
                       </div>
                     </div>
                   </div>
