@@ -33,6 +33,9 @@ import { AppContents } from './components/appcontents';
 import { RepositorySection } from './components/repositorysection';
 import { RepositoryState } from './components/repositorystate';
 import { useHandleGitCheckoutFile } from '@/hooks/handleGitCheckoutfile';
+import { useHandleGitLog } from '@/hooks/handleGitLog';
+import { DefaultLogFields } from 'simple-git';
+import { LogContents } from './components/logcontents';
 
 
 export default function Home() {
@@ -56,6 +59,7 @@ export default function Home() {
   const [commitmessage, setCommitMessage] = useState<string>('');
   const [newFileName, setNewFileName] = useState<string>('');
   const [gitBranch, setGitBranch] = useState<string>('');
+  const [loglist, setLoglist] = useState<ReadonlyArray<DefaultLogFields>|undefined>(undefined);
 
   let repo: Repo | undefined;
   if(selectRepo) {
@@ -272,6 +276,9 @@ export default function Home() {
   const handleGitCheckoutFile = useHandleGitCheckoutFile( setMessage, setLoading, () => {
     setMessage('checkoutしました。');
   });
+  const handleGitLog = useHandleGitLog(setLoading,setMessage, (loglist) => {
+    setLoglist(loglist);
+  });
 
   const isChiFile = (entry:{ name: string; isDirectory: boolean }) => {
     if (entry.isDirectory==true)
@@ -318,243 +325,258 @@ export default function Home() {
         { selectRepo ? (
           
           <div className="w-full" style={{maxWidth:600}}>
-
-            {editingFilePath!=undefined ? ( 
-
-              /*ファイル編集*/
-              <div className="mt-4 p-1 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
-                <h2 className="text-2xl font-semibold mb-4 text-blue-300">📕{repo?.name}</h2>                
-                <span className="text-white">
-                  {editingFilePath}              
-                </span>                
-
-                <div className="mt-4 p-0 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
-                  <textarea
-                    className="w-full h-80 p-0 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                    value={selectedFileContent}
-                    onChange={(e) => setSelectedFileContent(e.target.value)}
-                    placeholder="ファイルの内容を入力..."
-                  ></textarea>
-                  <button
-                    onClick={() => handleSaveFile(selectRepo,fileEncoding,editingFilePath,selectedFileContent,password)}
-                    disabled={loading}
-                    className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {loading ? '保存中...' : '保存'}
-                  </button>
-                  <button
-                    onClick={handleCancelEdit}
-                    disabled={loading}
-                    className="w-full sm:w-auto px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                  >
-                    キャンセル
-                  </button>
-                </div>
-              </div>
-
+            
+            {(loglist) ? (
+              <LogContents
+                loading={loading}
+                repo={repo}
+                loglist={loglist}
+                setLoglist={setLoglist}
+              />
             ) : (
 
               <div className="w-full" style={{maxWidth:600}}>
 
-                <RepositoryState
-                  loading={loading}
-                  repo={repo}
-                  selectRepo={selectRepo}
-                  gitBranch={gitBranch}
-                  gitStatusAhead={gitStatusAhead}
-                  gitStatusBehind={gitStatusBehind}
-                  gitStatusList={gitStatusList}
-                  commitmessage={commitmessage}
-                  setCommitMessage={setCommitMessage}
-                  handleGitReset={handleGitReset}
-                  handleGitCommit={handleGitCommit}
-                  handleGitPush={handleGitPush}
-                  handleGitPull={handleGitPull}
-                  handleGitRebase={handleGitRebase}
-                />
+                {editingFilePath!=undefined ? ( 
 
-                <div className="mt-4 p-1 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
+                  /*ファイル編集*/
+                  <div className="mt-4 p-1 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
+                    <h2 className="text-2xl font-semibold mb-4 text-blue-300">📕{repo?.name}</h2>                
+                    <span className="text-white">
+                      {editingFilePath}              
+                    </span>                
 
-                  {/* 文字コード選択ドロップダウン */}
-                  <label htmlFor="encoding-select" className="block text-sm font-medium text-gray-400 mb-1">
-                    文字コードを選択:
-                  </label>
-                  <select
-                    id="encoding-select"
-                    value={fileEncoding}
-                    onChange={(e) => handleSetEncode( selectRepo ,e.target.value)}
-                    className="w-full p-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={loading}
-                  >
-                    {supportedEncodings.map(enc => (
-                      <option key={enc} value={enc}>{enc.toUpperCase()}</option>
-                    ))}
-                  </select>
+                    <div className="mt-4 p-0 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
+                      <textarea
+                        className="w-full h-80 p-0 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                        value={selectedFileContent}
+                        onChange={(e) => setSelectedFileContent(e.target.value)}
+                        placeholder="ファイルの内容を入力..."
+                      ></textarea>
+                      <button
+                        onClick={() => handleSaveFile(selectRepo,fileEncoding,editingFilePath,selectedFileContent,password)}
+                        disabled={loading}
+                        className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {loading ? '保存中...' : '保存'}
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        disabled={loading}
+                        className="w-full sm:w-auto px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+                      >
+                        キャンセル
+                      </button>
+                    </div>
+                  </div>
 
-                  {/* パスワード入力欄 */}
-                  <label htmlFor="password-input" className="block text-sm font-medium text-gray-400 mt-4 mb-1">
-                    パスワード:
-                  </label>
-                  <input
-                    id="password-input"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="パスワードを入力"
-                    className="w-full p-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={loading}
-                  />
+                ) : (
 
-                  {/*ファイル一覧*/}
-                  <div className="flex flex-col items-center space-y-4 mb-4 w-full max-w-xl" style={{maxWidth:600}}>
+                  <div className="w-full" style={{maxWidth:600}}>
 
-                    <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4 w-full max-w-xl" style={{maxWidth:600}}>
-                      <div className="mt-4 p-6 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
+                    <RepositoryState
+                      loading={loading}
+                      repo={repo}
+                      selectRepo={selectRepo}
+                      gitBranch={gitBranch}
+                      gitStatusAhead={gitStatusAhead}
+                      gitStatusBehind={gitStatusBehind}
+                      gitStatusList={gitStatusList}
+                      commitmessage={commitmessage}
+                      setCommitMessage={setCommitMessage}
+                      handleGitReset={handleGitReset}
+                      handleGitCommit={handleGitCommit}
+                      handleGitPush={handleGitPush}
+                      handleGitPull={handleGitPull}
+                      handleGitRebase={handleGitRebase}
+                      handleGitLog={handleGitLog}
+                    />
 
-                          <p><span className="text-white">{currentPath}</span></p>
-                          <hr />
+                    <div className="mt-4 p-1 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
 
-                          <ul className="list-none p-0">
+                      {/* 文字コード選択ドロップダウン */}
+                      <label htmlFor="encoding-select" className="block text-sm font-medium text-gray-400 mb-1">
+                        文字コードを選択:
+                      </label>
+                      <select
+                        id="encoding-select"
+                        value={fileEncoding}
+                        onChange={(e) => handleSetEncode( selectRepo ,e.target.value)}
+                        className="w-full p-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        disabled={loading}
+                      >
+                        {supportedEncodings.map(enc => (
+                          <option key={enc} value={enc}>{enc.toUpperCase()}</option>
+                        ))}
+                      </select>
 
-                          { currentPath != '.' ? (
-                            //親ディレトリ
-                            <li
-                              key=".."
-                              onClick={() =>{ if (!loading) handleFilegoup();}}
-                              className="flex items-center space-x-3 p-2 rounded-md cursor-pointer hover:bg-gray-700 transition-colors duration-150"
-                            >
-                              <span className="text-yellow-400">🔼</span>
-                              <span className="text-white">..</span>
-                            </li>
-                            ) : ( null ) 
-                          }
+                      {/* パスワード入力欄 */}
+                      <label htmlFor="password-input" className="block text-sm font-medium text-gray-400 mt-4 mb-1">
+                        パスワード:
+                      </label>
+                      <input
+                        id="password-input"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="パスワードを入力"
+                        className="w-full p-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        disabled={loading}
+                      />
 
-                          {fileList.length > 0 ? (
-                              fileList.map(entry => (
+                      {/*ファイル一覧*/}
+                      <div className="flex flex-col items-center space-y-4 mb-4 w-full max-w-xl" style={{maxWidth:600}}>
 
-                                // gitStatusListから変更状態を取得
-                                // 変更状態がある場合はアイコンを変更
+                        <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4 w-full max-w-xl" style={{maxWidth:600}}>
+                          <div className="mt-4 p-6 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
+
+                              <p><span className="text-white">{currentPath}</span></p>
+                              <hr />
+
+                              <ul className="list-none p-0">
+
+                              { currentPath != '.' ? (
+                                //親ディレトリ
                                 <li
-                                  key={entry.name}
+                                  key=".."
+                                  onClick={() =>{ if (!loading) handleFilegoup();}}
                                   className="flex items-center space-x-3 p-2 rounded-md cursor-pointer hover:bg-gray-700 transition-colors duration-150"
                                 >
-                                  <span
-                                    className="text-yellow-400"
-                                    onClick={()=>{if (!loading) handleFileselect(selectRepo,entry);}}>
-                                      {handleStatusOut(gitStatusList,entry)}
-                                  </span>
+                                  <span className="text-yellow-400">🔼</span>
+                                  <span className="text-white">..</span>
+                                </li>
+                                ) : ( null ) 
+                              }
 
-                                  <span
-                                    className="text-white"
-                                    onClick={()=>{if (!loading) handleFileselect(selectRepo,entry);}}>
-                                    {entry.name}
-                                  </span>
+                              {fileList.length > 0 ? (
+                                  fileList.map(entry => (
 
-                                  <div className="flex items-center space-x-2 ml-auto">
+                                    // gitStatusListから変更状態を取得
+                                    // 変更状態がある場合はアイコンを変更
+                                    <li
+                                      key={entry.name}
+                                      className="flex items-center space-x-3 p-2 rounded-md cursor-pointer hover:bg-gray-700 transition-colors duration-150"
+                                    >
+                                      <span
+                                        className="text-yellow-400"
+                                        onClick={()=>{if (!loading) handleFileselect(selectRepo,entry);}}>
+                                          {handleStatusOut(gitStatusList,entry)}
+                                      </span>
 
-                                    { entry.isDirectory == false ? (
-                                      isChiFile(entry) ? (
-                                    <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                            disabled={loading || password.length < 5}
-                                            title={ password.length < 5 ? "パスワードを入力して下さい":`${entry.name}を復号化`}
-                                            onClick={() => {
-                                              handleDecrypt( selectRepo,currentPath,entry.name,password);
-                                              }}>
-                                      🔓
-                                    </button>):(
-                                    <button className="ml-2 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                            disabled={loading || password.length < 5}
-                                            title={ password.length < 5 ? "パスワードを入力して下さい":`${entry.name}を暗号化`}
-                                            onClick={() =>{
-                                              handleEncrypt( selectRepo,currentPath,entry.name,password);
-                                              }}>
-                                      🔒
-                                    </button>)
-                                    ):(null)}
-                                    { handleIsModify(gitStatusList,entry) ? (
-                                      <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                            disabled={loading}
-                                            title={ `${entry.name}を戻す`}
-                                            onClick={() => {
-                                              handleFileReset( selectRepo,currentPath,entry.name);
-                                              }}>
-                                        ↩️
-                                      </button>
-                                      ):(null) }
+                                      <span
+                                        className="text-white"
+                                        onClick={()=>{if (!loading) handleFileselect(selectRepo,entry);}}>
+                                        {entry.name}
+                                      </span>
 
-                                    { gitBranch == "(no" && entry.isDirectory == false && handleIsModify(gitStatusList,entry) ? (
-                                      <div>
+                                      <div className="flex items-center space-x-2 ml-auto">
+
+                                        { entry.isDirectory == false ? (
+                                          isChiFile(entry) ? (
                                         <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                                disabled={loading }
-                                                title={ `${entry.name}を自分のファイルに更新`}
+                                                disabled={loading || password.length < 5}
+                                                title={ password.length < 5 ? "パスワードを入力して下さい":`${entry.name}を復号化`}
                                                 onClick={() => {
-                                                  handleGitCheckoutFile( selectRepo, 'theirs' , currentPath,entry.name);
+                                                  handleDecrypt( selectRepo,currentPath,entry.name,password);
                                                   }}>
-                                          ◀
-                                        </button>
-                                        <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                                disabled={loading }
-                                                title={ `${entry.name}を相手のファイルに更新`}
+                                          🔓
+                                        </button>):(
+                                        <button className="ml-2 text-yellow-400 disabled:bg-gray-700 justify-end" 
+                                                disabled={loading || password.length < 5}
+                                                title={ password.length < 5 ? "パスワードを入力して下さい":`${entry.name}を暗号化`}
+                                                onClick={() =>{
+                                                  handleEncrypt( selectRepo,currentPath,entry.name,password);
+                                                  }}>
+                                          🔒
+                                        </button>)
+                                        ):(null)}
+                                        { handleIsModify(gitStatusList,entry) ? (
+                                          <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
+                                                disabled={loading}
+                                                title={ `${entry.name}を戻す`}
                                                 onClick={() => {
-                                                  handleGitCheckoutFile( selectRepo, 'ours' , currentPath,entry.name);
+                                                  handleFileReset( selectRepo,currentPath,entry.name);
                                                   }}>
-                                          ▶
+                                            ↩️
+                                          </button>
+                                          ):(null) }
+
+                                        { gitBranch == "(no" && entry.isDirectory == false && handleIsModify(gitStatusList,entry) ? (
+                                          <div>
+                                            <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
+                                                    disabled={loading }
+                                                    title={ `${entry.name}を自分のファイルに更新`}
+                                                    onClick={() => {
+                                                      handleGitCheckoutFile( selectRepo, 'theirs' , currentPath,entry.name);
+                                                      }}>
+                                              ◀
+                                            </button>
+                                            <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
+                                                    disabled={loading }
+                                                    title={ `${entry.name}を相手のファイルに更新`}
+                                                    onClick={() => {
+                                                      handleGitCheckoutFile( selectRepo, 'ours' , currentPath,entry.name);
+                                                      }}>
+                                              ▶
+                                            </button>
+                                          </div>
+                                        ):(null)}
+
+                                        <button
+                                          className="text-red-500 hover:text-red-700 justify-end"
+                                          disabled={loading}
+                                          onClick={() => handleFileDelete(selectRepo, currentPath, entry.name)}
+                                          title={`${entry.name}を削除`}
+                                        >
+                                          🗑️
                                         </button>
                                       </div>
-                                    ):(null)}
+                                    </li>
+                                  ))
+                              ) : (
+                                null
+                              )}
+                              </ul>
+                          </div>
+                        </div>
+                        {/* ファイル作成入力欄 */}
+                        <div className="flex w-full sm:max-w-xl space-x-2" style={{maxWidth:600}}>
 
-                                    <button
-                                      className="text-red-500 hover:text-red-700 justify-end"
-                                      disabled={loading}
-                                      onClick={() => handleFileDelete(selectRepo, currentPath, entry.name)}
-                                      title={`${entry.name}を削除`}
-                                    >
-                                      🗑️
-                                    </button>
-                                  </div>
-                                </li>
-                              ))
-                          ) : (
-                            null
-                          )}
-                          </ul>
+                          <input
+                            type="text"
+                            value={newFileName}
+                            onChange={(e) => setNewFileName(e.target.value)}
+                            placeholder="新規ファイル・フォルダ"
+                            className="flex-grow p-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <button
+                            onClick={() => handleNewFile( selectRepo, currentPath, newFileName, "file" )}
+                            disabled={loading || newFileName.length == 0 }
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex-shrink-0 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+                          >
+                          +📄
+                          </button>
+                          <button
+                            onClick={() => handleNewFile( selectRepo, currentPath, newFileName, "folder" )}
+                            disabled={loading || newFileName.length == 0 }
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex-shrink-0 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+                          >
+                          +📁
+                          </button>
+
+                        </div>
+                        <button
+                          onClick={() => handleRepoExit()}
+                          className="w-full max-w-2xl px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+                          style={{maxWidth:600}}
+                        >
+                          ⏏️ Go back
+                        </button>
                       </div>
                     </div>
-                    {/* ファイル作成入力欄 */}
-                    <div className="flex w-full sm:max-w-xl space-x-2" style={{maxWidth:600}}>
-
-                      <input
-                        type="text"
-                        value={newFileName}
-                        onChange={(e) => setNewFileName(e.target.value)}
-                        placeholder="新規ファイル・フォルダ"
-                        className="flex-grow p-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <button
-                        onClick={() => handleNewFile( selectRepo, currentPath, newFileName, "file" )}
-                        disabled={loading || newFileName.length == 0 }
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex-shrink-0 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                      >
-                      +📄
-                      </button>
-                      <button
-                        onClick={() => handleNewFile( selectRepo, currentPath, newFileName, "folder" )}
-                        disabled={loading || newFileName.length == 0 }
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex-shrink-0 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                      >
-                      +📁
-                      </button>
-
-                    </div>
-                    <button
-                      onClick={() => handleRepoExit()}
-                      className="w-full max-w-2xl px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                      style={{maxWidth:600}}
-                    >
-                      ⏏️ Go back
-                    </button>
                   </div>
-                </div>
+                )}
+
               </div>
             )}
           </div>

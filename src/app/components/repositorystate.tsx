@@ -20,6 +20,7 @@ export function RepositoryState({
   handleGitPush,
   handleGitPull,
   handleGitRebase,
+  handleGitLog,
 }: {
   loading: boolean;
   repo: Repo | undefined;
@@ -35,6 +36,7 @@ export function RepositoryState({
   handleGitPush: (gitinfostr:string) => void;
   handleGitPull: (gitinfostr:string) => void;
   handleGitRebase: (gitinfostr:string) => void;
+  handleGitLog: (gitinfostr:string) => void;
 }) {
   return (
 
@@ -57,7 +59,6 @@ export function RepositoryState({
                 ):(null)}
 
               <div className="mt-4 p-6 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
-                
                 {gitBranch == "(no" && gitStatusList.length == 0 ? (
                   <div>
                   {/* リベース */}
@@ -112,9 +113,16 @@ export function RepositoryState({
                 </div>
               )}
 
-            </div>
+              <button
+                onClick={()=>handleGitLog(selectRepo)}
+                disabled={loading}
+                className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+              >
+                ログ
+              </button>              
 
-            </div>    
+            </div>
+          </div>    
   );
 }
 

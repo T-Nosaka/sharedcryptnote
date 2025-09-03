@@ -1,4 +1,4 @@
-import { ResetMode, simpleGit, SimpleGit, SimpleGitOptions } from 'simple-git';
+import { DefaultLogFields, ResetMode, simpleGit, SimpleGit, SimpleGitOptions } from 'simple-git';
 
 import fs from 'fs/promises';
 import { writeFile } from 'fs/promises';
@@ -445,4 +445,23 @@ export class GitInfo {
             throw error;
         }
     }
+
+    /*
+     * Git Log
+     */
+    async Log() : Promise<ReadonlyArray<DefaultLogFields>> {
+        try {
+            const options: Partial<SimpleGitOptions> = {
+                baseDir: this.baseDir(),
+            };
+            const git: SimpleGit = simpleGit(options);
+
+            const result =  await git.log();
+            return result.all
+
+        } catch (error) {
+            console.error('Error during git checkout:', error);
+            throw error;
+        }
+    }            
 }
