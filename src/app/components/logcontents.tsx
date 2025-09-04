@@ -93,16 +93,22 @@ export function LogContents({
                                 <tr>
                                     <td colSpan={3} className="p-4 bg-gray-800">
                                         <div className="text-white">
-                                            <ul>
+                                            <tbody className="bg-gray-800">
+                                                <tr>
                                                 {logdiffresult.files.map(file => {
                                                     const {status, color} = statusAnalyze(file);
                                                     return(
-                                                    <li key={file.file} className="mb-1">
-                                                        <span className={color}>[{ status }]</span>
-                                                        <span className="font-semibold">{file.file}</span>:
-                                                    </li>
+                                                        <ul key={file.file}>
+                                                        <td className="px-1 py-1 border-gray-700 text-left text-sm">
+                                                            <span className={color}>[{ status }]</span>
+                                                        </td>
+                                                        <td className="px-1 py-1 border-gray-700 text-right text-sm">
+                                                            <span className="font-semibold">{file.file}</span>
+                                                        </td>
+                                                        </ul>
                                                 )})}
-                                            </ul>
+                                                </tr>
+                                            </tbody>
                                         </div>
                                     </td>
                                 </tr>
