@@ -34,8 +34,9 @@ import { RepositorySection } from './components/repositorysection';
 import { RepositoryState } from './components/repositorystate';
 import { useHandleGitCheckoutFile } from '@/hooks/handleGitCheckoutfile';
 import { useHandleGitLog } from '@/hooks/handleGitLog';
-import { DefaultLogFields } from 'simple-git';
+import { DefaultLogFields, DiffResult } from 'simple-git';
 import { LogContents } from './components/logcontents';
+import { useHandleGitLogDetail } from '@/hooks/handleGitLogDetail';
 
 
 export default function Home() {
@@ -60,6 +61,7 @@ export default function Home() {
   const [newFileName, setNewFileName] = useState<string>('');
   const [gitBranch, setGitBranch] = useState<string>('');
   const [loglist, setLoglist] = useState<ReadonlyArray<DefaultLogFields>|undefined>(undefined);
+  const [logdiffresult, setLogdiffResult] = useState<DiffResult|undefined>(undefined);
 
   let repo: Repo | undefined;
   if(selectRepo) {
@@ -286,6 +288,9 @@ export default function Home() {
   const handleGitLog = useHandleGitLog(setLoading,setMessage, (loglist) => {
     setLoglist(loglist);
   });
+  const handleGitLogDetail = useHandleGitLogDetail(setLoading,setMessage, (diffresult) => {
+    setLogdiffResult(diffresult)
+  });
 
   const isChiFile = (entry:{ name: string; isDirectory: boolean }) => {
     if (entry.isDirectory==true)
@@ -336,9 +341,13 @@ export default function Home() {
             {(loglist) ? (
               <LogContents
                 loading={loading}
+                logdiffresult={logdiffresult}
                 repo={repo}
+                selectRepo={selectRepo}
                 loglist={loglist}
                 setLoglist={setLoglist}
+                setLogdiffResult={setLogdiffResult}
+                handleGitLogDetail={handleGitLogDetail}
               />
             ) : (
 

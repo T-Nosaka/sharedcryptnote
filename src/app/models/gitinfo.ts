@@ -1,4 +1,4 @@
-import { DefaultLogFields, ResetMode, simpleGit, SimpleGit, SimpleGitOptions } from 'simple-git';
+import { DefaultLogFields, DiffResult, ResetMode, simpleGit, SimpleGit, SimpleGitOptions } from 'simple-git';
 
 import fs from 'fs/promises';
 import { writeFile } from 'fs/promises';
@@ -154,9 +154,11 @@ export class GitInfo {
             };
             const git: SimpleGit = simpleGit(options);
             await git.addConfig('pull.rebase', 'true');
+            await git.addConfig('core.quotepath', 'false', true, 'worktree');
 
             await git.addConfig('user.email', email, true, 'worktree');
             await git.addConfig('user.name', username, true, 'worktree');
+            
 
         } catch (err) {
             console.error('エラー:', err);
@@ -452,16 +454,33 @@ export class GitInfo {
     async Log() : Promise<ReadonlyArray<DefaultLogFields>> {
         try {
             const options: Partial<SimpleGitOptions> = {
-                baseDir: this.baseDir(),
+                baseDir: this.baseDir()
             };
             const git: SimpleGit = simpleGit(options);
 
-            const result =  await git.log();
+            const result =  await git.log({maxCount: 100});
             return result.all
 
         } catch (error) {
             console.error('Error during git checkout:', error);
             throw error;
         }
-    }            
+    }
+
+    /*
+     * Git LogDetail
+     */
+    async LogDetail(hash: string) : Promise<DiffResult> {
+        try {
+            const options: Partial<SimpleGitOptions> = {
+                baseDir: this.baseDir(),
+            };
+            const git: SimpleGit = simpleGit(options);
+
+            return await git.diffSummary([`${hash}^`, hash]);
+        } catch (error) {
+            console.error('Error during git checkout:', error);
+            throw error;
+        }
+    }
 }
