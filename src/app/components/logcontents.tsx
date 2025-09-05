@@ -47,8 +47,10 @@ export function LogContents({
 
     //状態解析
     const statusAnalyze = (file:DiffResultTextFile|DiffResultBinaryFile|DiffResultNameStatusFile) => {
-        const after = file.after;
-        const before = file.before;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const after = (file as any).after;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const before = (file as any).before;
         let status = '変更';
         let color = 'text-yellow-400';
 
