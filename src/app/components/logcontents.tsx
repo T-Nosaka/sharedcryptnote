@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { DefaultLogFields, DiffResult, DiffResultBinaryFile, DiffResultNameStatusFile, DiffResultTextFile } from 'simple-git';
 import { Repo } from '../models/gitinfo';
+import { CheckoutFileMode } from '@/hooks/handleGitCheckoutfile';
 
 /*
  * ログ処理
@@ -16,6 +17,7 @@ export function LogContents({
     setLoglist,
     setLogdiffResult,
     handleGitLogDetail,
+    handleGitCheckoutHashFile,
 }:{
     loading: boolean;
     repo: Repo | undefined;
@@ -25,6 +27,7 @@ export function LogContents({
     setLoglist:(loglist:ReadonlyArray<DefaultLogFields>|undefined)=>void;
     setLogdiffResult:(logdiffresult:DiffResult|undefined)=>void;
     handleGitLogDetail:(gitinfostr:string, hash:string) => void;
+    handleGitCheckoutHashFile:(gitinfostr: string, mode: CheckoutFileMode, selectFilePath: string, hash?: string) => void;
 }) {
 
     //排他選択の為、選択行キーを確保
@@ -97,10 +100,22 @@ export function LogContents({
                                                 <tr>
                                                 {logdiffresult.files.map(file => {
                                                     const {status, color} = statusAnalyze(file);
+                                                    
                                                     return(
                                                         <ul key={file.file}>
                                                         <td className="px-1 py-1 border-gray-700 text-left text-sm">
                                                             <span className={color}>[{ status }]</span>
+                                                        </td>
+                                                        <td className="px-1 py-1 border-gray-700 text-left text-sm">
+                                                            <button
+                                                            disabled={loading || status === '新規'}
+                                                            onClick={() => {
+                                                                handleGitCheckoutHashFile( selectRepo, 'hash' , file.file, log.hash+"^");
+                                                            }}
+                                                            className="px-1 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+                                                            >
+                                                                戻す
+                                                            </button>                                                            
                                                         </td>
                                                         <td className="px-1 py-1 border-gray-700 text-right text-sm">
                                                             <span className="font-semibold">{file.file}</span>

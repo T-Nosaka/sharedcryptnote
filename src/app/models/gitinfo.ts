@@ -415,6 +415,23 @@ export class GitInfo {
     }
 
     /*
+     * Git Checkout
+     */
+    async CheckoutHash(filepath: string, hash: string) : Promise<void> {
+        try {
+            const options: Partial<SimpleGitOptions> = {
+                baseDir: this.baseDir(),
+            };
+            const git: SimpleGit = simpleGit(options);
+
+            await git.checkout([hash, filepath]);
+        } catch (error) {
+            console.error('Error during git checkout:', error);
+            throw error;
+        }
+    }
+
+    /*
      * Git Checkout --ours
      */
     async CheckoutOurs( filepath: string ) : Promise<void> {

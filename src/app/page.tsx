@@ -32,7 +32,7 @@ import { useHandleGitRebase } from '@/hooks/handleRebase';
 import { AppContents } from './components/appcontents';
 import { RepositorySection } from './components/repositorysection';
 import { RepositoryState } from './components/repositorystate';
-import { useHandleGitCheckoutFile } from '@/hooks/handleGitCheckoutfile';
+import { useHandleGitCheckoutFile, useHandleGitCheckoutHashFile } from '@/hooks/handleGitCheckoutfile';
 import { useHandleGitLog } from '@/hooks/handleGitLog';
 import { DefaultLogFields, DiffResult } from 'simple-git';
 import { LogContents } from './components/logcontents';
@@ -174,18 +174,10 @@ export default function Home() {
       const status = gitstatuslist.find(file => file.path === fullpath);
       if (status ) {
 
-          if( status.index === 'A' )
+          if( status.index === 'A' || status.working_dir === 'A' )
             return "➕"+fileicon; // 新規ファイル
-          if( status.working_dir === 'D' )
-            return "❌"+fileicon; // 削除されたファイル
-          if( status.working_dir === 'A' )
-            return "✔️"+fileicon; // 追加されたファイル
-          if( status.working_dir === 'M' )
+          if( status.index === 'M' || status.working_dir === 'M' )
             return "✏️"+fileicon; // 変更されたファイル
-          if( status.working_dir === 'R' )
-            return "🔀"+fileicon; // 名前変更されたファイル
-          if( status.working_dir === 'C' )
-            return "📝"+fileicon; // コピーされたファイル
 
         return status.working_dir+fileicon; // 変更があるファイル  
       }
@@ -285,6 +277,12 @@ export default function Home() {
   const handleGitCheckoutFile = useHandleGitCheckoutFile( setMessage, setLoading, () => {
     setMessage('checkoutしました。');
   });
+  const handleGitCheckoutHashFile = useHandleGitCheckoutHashFile( setMessage, setLoading, () => {
+    setMessage('checkoutしました。');
+    if(selectRepo) {
+      handleRepoFilelist(selectRepo, currentPath);
+    }
+  });
   const handleGitLog = useHandleGitLog(setLoading,setMessage, (loglist) => {
     setLoglist(loglist);
   });
@@ -348,6 +346,7 @@ export default function Home() {
                 setLoglist={setLoglist}
                 setLogdiffResult={setLogdiffResult}
                 handleGitLogDetail={handleGitLogDetail}
+                handleGitCheckoutHashFile={handleGitCheckoutHashFile}
               />
             ) : (
 

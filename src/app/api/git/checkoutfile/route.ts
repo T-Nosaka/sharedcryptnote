@@ -9,7 +9,7 @@ import path from "path";
  */
 export async function POST(req: NextRequest) {
   try {
-    const { gitinfostr, mode, selectFilePath } = await req.json();
+    const { gitinfostr, mode, selectFilePath, hash } = await req.json();
 
     const session = await getServerSession(authOptions);
 
@@ -40,6 +40,9 @@ export async function POST(req: NextRequest) {
     }
 
     switch(mode) {
+        case 'hash':
+            await gitinfo?.CheckoutHash( selectFilePath, hash );
+            break;
         case 'ours':
             await gitinfo?.CheckoutOurs( absoluteFilePath );
             break;
