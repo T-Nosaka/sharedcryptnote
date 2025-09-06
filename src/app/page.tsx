@@ -347,6 +347,8 @@ export default function Home() {
                       gitStatusList={gitStatusList}
                       gitBranch={gitBranch}
                       newFileName={newFileName}
+                      setLoading={setLoading}
+                      setMessage={setMessage}
                       setPassword={setPassword}
                       setNewFileName={setNewFileName}
                       handleSetEncode={handleSetEncode}

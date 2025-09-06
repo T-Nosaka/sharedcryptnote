@@ -9,7 +9,7 @@ import { DefaultLogFields } from 'simple-git';
  */
 export async function POST(req: NextRequest) {
   try {
-    const { gitinfostr } = await req.json();
+    const { gitinfostr, selectFilePath } = await req.json();
 
     const session = await getServerSession(authOptions);
 
@@ -27,9 +27,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'gitinfo is required' }, { status: 400 });
     }
  
-    const loglist : ReadonlyArray<DefaultLogFields> =  await gitinfo?.Log();
+    if (selectFilePath === undefined ) {
+      const loglist : ReadonlyArray<DefaultLogFields> =  await gitinfo?.Log();
 
-    return NextResponse.json({ loglist: loglist, message: 'Repository log successfully!' });
+      return NextResponse.json({ loglist: loglist, message: 'Repository log successfully!' });
+    } else {
+      const loglist : ReadonlyArray<DefaultLogFields> =  await gitinfo?.FileLog(selectFilePath);
+
+      return NextResponse.json({ loglist: loglist, message: 'Repository file log successfully!' });
+    }
 
   } catch (error) {
     console.error('Error during git log:', error);

@@ -475,11 +475,11 @@ export class GitInfo {
             };
             const git: SimpleGit = simpleGit(options);
 
-            const result =  await git.log({maxCount: 100});
+            const result = await git.log({maxCount: 100});
             return result.all
 
         } catch (error) {
-            console.error('Error during git checkout:', error);
+            console.error('Error during git log:', error);
             throw error;
         }
     }
@@ -496,7 +496,26 @@ export class GitInfo {
 
             return await git.diffSummary([`${hash}^`, hash]);
         } catch (error) {
-            console.error('Error during git checkout:', error);
+            console.error('Error during git logdetail:', error);
+            throw error;
+        }
+    }
+
+    /*
+     * Git FileLog
+     */
+    async FileLog(filepath: string) : Promise<ReadonlyArray<DefaultLogFields>> {
+        try {
+            const options: Partial<SimpleGitOptions> = {
+                baseDir: this.baseDir(),
+            };
+            const git: SimpleGit = simpleGit(options);
+
+            const result = await git.log({file:filepath,maxCount: 100});
+            return result.all
+
+        } catch (error) {
+            console.error('Error during git filelog:', error);
             throw error;
         }
     }
