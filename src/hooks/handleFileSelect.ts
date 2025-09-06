@@ -9,7 +9,7 @@ export function useHandleFileSelect(
     callback?: (nextpath:string) => void,
     filecallback?: (fullPath:string,fileExtension:string) => void ) {
 
-    return async (selectRepo:string, entry: { name: string; isDirectory: boolean }) => {
+    return async (entry: { name: string; isDirectory: boolean }) => {
         if (entry.isDirectory) {
             // ディレクトリの場合、そのディレクトリに移動
             const newPath = path.join(currentPath, entry.name);
