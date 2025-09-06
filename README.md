@@ -48,6 +48,21 @@ GOOGLE_CLIENT_SECRET=
 NEXTAUTH_URL=https://sharednote.hoge.com
 ```
 
+## Docker
+
+It's easy to build with Docker.
+Just get Google authentication and create a .env.local file.
+Then it should be easy to start.
+
+```bash
+mkdir sharedcryptnote
+cp Dockerfile sharedcryptnote/.
+cp docker-compose.yml sharedcryptnote/.
+cd sharedcryptnote
+vi .env.local
+docker compose up
+```
+
 ## Getting Started
 First, run the development server:
 
