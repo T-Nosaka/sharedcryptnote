@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Repo } from '../models/gitinfo';
 
 /*
- * ファイルリスト
+ * ファイル編集
  */
 export function FileEditContents({
   loading,
@@ -31,6 +31,30 @@ export function FileEditContents({
   handleCancelEdit: () => void;
 })
  {
+    const [isDirty, setIsDirty] = useState(false);
+
+    useEffect(() => {
+        setIsDirty(false);
+    }, [editingFilePath]);
+
+    const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setSelectedFileContent(e.target.value);
+        setIsDirty(true);
+    };
+
+    const onSave = () => {
+        handleSaveFile(selectRepo,fileEncoding,editingFilePath,selectedFileContent,password);
+        setIsDirty(false);
+    }
+    const onCancel = () => {
+        if (isDirty) {
+          if (!window.confirm(`編集を破棄しますか？`)) {
+            return;
+          }
+        }
+        handleCancelEdit();
+    }
+
   return (
     <div className="mt-4 p-1 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
         <h2 className="text-2xl font-semibold mb-4 text-blue-300">📕{repo?.name}</h2>                
@@ -39,26 +63,27 @@ export function FileEditContents({
         </span>                
 
         <div className="mt-4 p-0 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
-            <textarea
-            className="w-full h-80 p-0 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-            value={selectedFileContent}
-            onChange={(e) => setSelectedFileContent(e.target.value)}
-            placeholder="ファイルの内容を入力..."
-            ></textarea>
             <button
-            onClick={() => handleSaveFile(selectRepo,fileEncoding,editingFilePath,selectedFileContent,password)}
-            disabled={loading}
+            onClick={onSave}
+            disabled={loading || !isDirty}
             className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
             >
             {loading ? '保存中...' : '保存'}
             </button>
             <button
-            onClick={handleCancelEdit}
+            onClick={onCancel}
             disabled={loading}
             className="w-full sm:w-auto px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
             >
             キャンセル
             </button>
+
+            <textarea
+            className="w-full h-80 p-0 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+            value={selectedFileContent}
+            onChange={handleContentChange}
+            placeholder="ファイルの内容を入力..."
+            ></textarea>
         </div>
     </div>
     );
