@@ -36,6 +36,7 @@ export function FileListContents({
   handleFileReset,
   handleGitCheckoutFile,
   handleNewFile,
+  handleGitCheckoutHashFile,
 }: {
   loading: boolean;
   selectRepo: string;
@@ -59,6 +60,7 @@ export function FileListContents({
   handleFileReset: (gitinfostr: string, currentPath: string, fileName: string) => void;
   handleGitCheckoutFile: (gitinfostr: string, mode: CheckoutFileMode, currentPath: string, fileName: string) => void;
   handleNewFile: (gitinfostr: string, currentPath: string, fileName: string, type: string) => void;
+  handleGitCheckoutHashFile:(gitinfostr: string, mode: CheckoutFileMode, selectFilePath: string, hash?: string) => void;
 })
  {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -323,10 +325,12 @@ export function FileListContents({
       </div>
       {loglist ? (
         <FileLogModal 
+          selectRepo={selectRepo}
           isOpen={isModalOpen}
           onClose={() => {setModalOpen(false);setLoglist([]);}}
           fileName={selectedFile}
           loglist={loglist}
+          handleGitCheckoutHashFile={handleGitCheckoutHashFile}
         />
       ):(null)}
     </>

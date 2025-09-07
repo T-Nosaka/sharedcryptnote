@@ -360,6 +360,7 @@ export default function Home() {
                       handleFileReset={handleFileReset}
                       handleGitCheckoutFile={handleGitCheckoutFile}
                       handleNewFile={handleNewFile}
+                      handleGitCheckoutHashFile={handleGitCheckoutHashFile}
                     />
 
                   </div>

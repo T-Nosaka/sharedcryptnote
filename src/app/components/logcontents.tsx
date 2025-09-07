@@ -70,7 +70,10 @@ export function LogContents({
             <h2 className="text-2xl font-semibold mb-4 text-blue-300">📕{repo?.name}</h2>
             <div className="overflow-x-auto mt-4">
                 <button
-                onClick={() => setLoglist( undefined )}
+                onClick={() => {
+                    setLoglist( undefined );
+                    setLogdiffResult(undefined);
+                    setSelectedLogHash(undefined);}}
                 disabled={loading}
                 className="w-full max-w-2xl px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
                 >
@@ -113,6 +116,9 @@ export function LogContents({
                                                             disabled={loading || status === '新規'}
                                                             onClick={() => {
                                                                 handleGitCheckoutHashFile( selectRepo, 'hash' , file.file, log.hash+"^");
+                                                                setLoglist( undefined );
+                                                                setLogdiffResult(undefined);
+                                                                setSelectedLogHash(undefined);
                                                             }}
                                                             className="px-1 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
                                                             >

@@ -2,15 +2,18 @@
 import React from 'react';
 import './filelogmodal.css';
 import { DefaultLogFields } from 'simple-git';
+import { CheckoutFileMode } from '@/hooks/handleGitCheckoutfile';
 
 interface FileLogModalProps {
+  selectRepo: string;
   isOpen: boolean;
   onClose: () => void;
   fileName: string;
-  loglist:ReadonlyArray<DefaultLogFields>
+  loglist:ReadonlyArray<DefaultLogFields>,
+  handleGitCheckoutHashFile: (gitinfostr: string, mode: CheckoutFileMode, selectFilePath: string, hash?: string) => void
 }
 
-const FileLogModal: React.FC<FileLogModalProps> = ({ isOpen, onClose, fileName, loglist }) => {
+const FileLogModal: React.FC<FileLogModalProps> = ({ selectRepo,isOpen, onClose, fileName, loglist, handleGitCheckoutHashFile }) => {
   if (!isOpen) {
     return null;
   }
@@ -27,15 +30,21 @@ const FileLogModal: React.FC<FileLogModalProps> = ({ isOpen, onClose, fileName, 
             <li key={log.hash} className="log-item">
 
               <p className="log-message">{log.message}</p>
-              
+
               <p className="log-meta">
                 <span className="log-meta">{log.author_name}</span>
               </p>
+
               <p className="log-meta">
                 <span className="log-meta">{log.author_email}</span>
               </p>
               <p className="log-meta">
-                 保存日 {new Date(log.date).toLocaleDateString()}
+                <button
+                className="px-1 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+                onClick={() => {handleGitCheckoutHashFile( selectRepo, 'hash' , fileName, log.hash+"^");onClose();}}
+                >
+                    {new Date(log.date).toLocaleDateString()}に戻す
+                </button>                
               </p>
 
             </li>
