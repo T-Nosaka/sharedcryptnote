@@ -67,19 +67,15 @@ export function LogContents({
 
     return (
         <div className="mt-4 p-6 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
-            <h2 className="text-2xl font-semibold mb-4 text-blue-300">📕{repo?.name}</h2>
-            <div className="overflow-x-auto mt-4">
-                <button
-                onClick={() => {
+            <div className="modal-header">
+            <p><span className="text-white">📕{repo?.name}</span></p>
+            <button className="modal-close-btn" onClick={() => {
                     setLoglist( undefined );
                     setLogdiffResult(undefined);
-                    setSelectedLogHash(undefined);}}
-                disabled={loading}
-                className="w-full max-w-2xl px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-                >
-                ⏏️ 戻る
-                </button>
+                    setSelectedLogHash(undefined);}}>&times;</button>
+            </div>
 
+            <div className="overflow-x-auto mt-4">
                 <table className="min-w-full border-collapse border border-gray-700">
                     <thead className="bg-gray-800">
                     <tr>

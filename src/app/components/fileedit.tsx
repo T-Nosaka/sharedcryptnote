@@ -57,9 +57,13 @@ export function FileEditContents({
 
   return (
     <div className="mt-4 p-1 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
-        <h2 className="text-2xl font-semibold mb-4 text-blue-300">📕{repo?.name}</h2>                
+        <div className="modal-header">
+          <p><span className="text-white">📕{repo?.name}</span></p>
+          <button className="modal-close-btn" onClick={() => onCancel()}>&times;</button>
+        </div>
+
         <span className="text-white">
-            {editingFilePath}              
+            {editingFilePath}
         </span>                
 
         <div className="mt-4 p-0 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
@@ -69,13 +73,6 @@ export function FileEditContents({
             className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
             >
             {loading ? '保存中...' : '保存'}
-            </button>
-            <button
-            onClick={onCancel}
-            disabled={loading}
-            className="w-full sm:w-auto px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-            >
-            キャンセル
             </button>
 
             <textarea
