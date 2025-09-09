@@ -39,6 +39,7 @@ import { LogContents } from './components/logcontents';
 import { useHandleGitLogDetail } from '@/hooks/handleGitLogDetail';
 import { FileListContents } from './components/filelistcontents';
 import { FileEditContents } from './components/fileedit';
+import { useHandleRepofilesearch } from '@/hooks/handleRepoFileSearch';
 
 
 export default function Home() {
@@ -51,6 +52,7 @@ export default function Home() {
   const [repoList, setRepoList] = useState<{ name: string; isDirectory: boolean }[]>([]);
   const [selectRepo, setselectRepo] = useState<string|undefined>(undefined); // 選択中リポジトリ
   const [fileList, setFileList] = useState<{ name: string; isDirectory: boolean }[]>([]);
+  const [filesearchList, setFilesearchList] = useState<{ name: string; isDirectory: boolean }[]>([]);
   const [currentPath, setCurrentPath] = useState<string>('.');
   const [editingFilePath, setEditingFilePath] = useState<string|undefined>(undefined);
   const [selectedFileContent, setSelectedFileContent] = useState<string>(''); // 編集中のファイル内容
@@ -78,6 +80,8 @@ export default function Home() {
 
   const handleRepoFilelist = useHandleRepofilelist(setFileList, setLoading, setMessage, async (gitinfostr) => {
     handleGitStatus(gitinfostr);
+  });
+  const handleRepoFilesearchlist = useHandleRepofilesearch( setFilesearchList, setLoading, setMessage, async () => {
   });
   const handleRepolist = useHandleRepolist(setRepoList, setLoading, setMessage);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -344,6 +348,7 @@ export default function Home() {
                       password={password}
                       currentPath={currentPath}
                       fileList={fileList}
+                      filesearchList={filesearchList}
                       gitStatusList={gitStatusList}
                       gitBranch={gitBranch}
                       newFileName={newFileName}
@@ -351,6 +356,7 @@ export default function Home() {
                       setMessage={setMessage}
                       setPassword={setPassword}
                       setNewFileName={setNewFileName}
+                      setFilesearchList={setFilesearchList}
                       handleSetEncode={handleSetEncode}
                       handleFilegoup={handleFilegoup}
                       handleFileselect={handleFileselect}
@@ -361,6 +367,7 @@ export default function Home() {
                       handleGitCheckoutFile={handleGitCheckoutFile}
                       handleNewFile={handleNewFile}
                       handleGitCheckoutHashFile={handleGitCheckoutHashFile}
+                      handleRepoFilesearchlist={handleRepoFilesearchlist}
                     />
 
                   </div>
