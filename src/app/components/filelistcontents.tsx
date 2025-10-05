@@ -147,7 +147,7 @@ export function FileListContents({
 
           {/* 文字コード選択ドロップダウン */}
           <label htmlFor="encoding-select" className="block text-sm font-medium text-gray-400 mb-1">
-          文字コードを選択:
+          📝文字コードを選択:
           </label>
           <select
           id="encoding-select"
@@ -161,27 +161,13 @@ export function FileListContents({
           ))}
           </select>
 
-          {/* パスワード入力欄 */}
-          <label htmlFor="password-input" className="block text-sm font-medium text-gray-400 mt-4 mb-1">
-            パスワード:
-          </label>
-          <input
-            id="password-input"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="パスワードを入力"
-            className="w-full p-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={loading}
-          />
-
           {/* ファイル検索入力欄 */}
           <div className="flex w-full sm:max-w-xl space-x-2 mt-4">
             <input
               type="text"
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
-              placeholder="ファイル名検索"
+              placeholder="🔍ファイル名検索"
               className="flex-grow p-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
@@ -192,6 +178,19 @@ export function FileListContents({
             >
               🔍
             </button>
+          </div>
+
+          {/* パスワード入力欄 */}
+          <div className="flex w-full sm:max-w-xl space-x-2 mt-4">
+            <input
+              id="password-input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="🗝️パスワードを入力"
+              className="w-full p-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            />
           </div>
 
           {/*ファイル一覧*/}

@@ -94,3 +94,12 @@ body {
     font-size: 1.2rem;
   }
 }
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+.blinking-text {
+  animation: blink 1s step-start 0s infinite;
+}

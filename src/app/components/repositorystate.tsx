@@ -48,7 +48,13 @@ export function RepositoryState({
                 <button className="modal-close-btn" onClick={() => handleRepoExit()}>&times;</button>
               </div>
               <p>{"ブランチ: "+gitBranch}</p>
-              <p>{"同期状況: "+gitStatusAhead+"進み "+gitStatusBehind+"遅れ"}</p>
+              <p>{"同期状況: "}
+                <span className={(gitStatusAhead > 0 || gitStatusBehind > 0) ? "text-yellow-400 blinking-text" : ""}>
+                  {gitStatusAhead > 0 && `${gitStatusAhead}進み `}
+                  {gitStatusBehind > 0 && `${gitStatusBehind}遅れ`}
+                  {(gitStatusAhead === 0 && gitStatusBehind === 0) && "同期済み"}
+                </span>
+              </p>
               {gitStatusList.length > 0 ? (
                 <div>
                   <p>{"変更:"+gitStatusList.length + "ファイル"}</p>
