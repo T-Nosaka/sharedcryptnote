@@ -59,21 +59,33 @@ export function FileEditContents({
     <div className="mt-4 p-1 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
         <div className="modal-header">
           <p><span className="text-white">📕{repo?.name}</span></p>
-          <button className="modal-close-btn" onClick={() => onCancel()}>&times;</button>
         </div>
 
         <span className="text-white">
-            {editingFilePath}
+          {editingFilePath}
         </span>                
 
         <div className="mt-4 p-0 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
+
+        <div className="flex items-center justify-between w-full">
+          {/* 左側：保存ボタン */}
+          <div>
             <button
-            onClick={onSave}
-            disabled={loading || !isDirty}
-            className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+              onClick={onSave}
+              disabled={loading || !isDirty}
+              className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
             >
-            {loading ? '保存中...' : '保存'}
+              {loading ? '...💾...' : '💾'}
             </button>
+          </div>
+
+          {/* 右側：閉じるボタン */}
+          <div>
+            <button className="modal-close-btn" onClick={() => onCancel()}>
+              &times;
+            </button>
+          </div>
+        </div>
 
             <textarea
             className="w-full h-80 p-0 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
