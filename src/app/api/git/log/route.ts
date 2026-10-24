@@ -1,6 +1,7 @@
 import { UserInfo } from '@/app/models/userinfo';
 import { NextRequest, NextResponse } from 'next/server';
 import { authOptions } from '@/app/lib/auth';
+import { isEmailAllowed } from '@/app/lib/allowlist';
 import { getServerSession } from 'next-auth';
 import { DefaultLogFields } from 'simple-git';
 
@@ -18,6 +19,10 @@ export async function POST(req: NextRequest) {
     }
     if (!session) {
       return NextResponse.json({ error: 'session is required' }, { status: 400 });
+    }
+    // ALLOWUSERS 制限: 許可外メアドは 403（既存セッション対策）
+    if (!isEmailAllowed(session.user?.email)) {
+      return NextResponse.json({ error: 'Forbidden: email not allowed' }, { status: 403 });
     }
 
     //ユーザー取得

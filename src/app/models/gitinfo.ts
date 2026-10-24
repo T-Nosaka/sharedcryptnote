@@ -98,6 +98,7 @@ export class GitInfo {
         // simple-gitのオプション
         const options: Partial<SimpleGitOptions> = {
             baseDir: basepath,
+            unsafe: { allowUnsafeSshCommand: true },
             binary: 'git',
             maxConcurrentProcesses: 6,
             timeout: {
@@ -285,6 +286,7 @@ export class GitInfo {
         try {
             const options: Partial<SimpleGitOptions> = {
                 baseDir: this.baseDir(),
+                unsafe: { allowUnsafeSshCommand: true },
             };
             // SSH鍵ファイル作成
             if (this.sshkey != undefined) {
@@ -319,6 +321,7 @@ export class GitInfo {
         try {
             const options: Partial<SimpleGitOptions> = {
                 baseDir: this.baseDir(),
+                unsafe: { allowUnsafeSshCommand: true },
             };
             // SSH鍵ファイル作成
             if (this.sshkey != undefined) {
@@ -353,6 +356,7 @@ export class GitInfo {
         try {
             const options: Partial<SimpleGitOptions> = {
                 baseDir: this.baseDir(),
+                unsafe: { allowUnsafeSshCommand: true },
             };
             // SSH鍵ファイル作成
             if (this.sshkey != undefined) {
