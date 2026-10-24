@@ -48,6 +48,49 @@ GOOGLE_CLIENT_SECRET=
 NEXTAUTH_URL=https://sharednote.hoge.com
 ```
 
+## Allow Users (ALLOWUSERS)
+Restrict which Google accounts can sign in, using an allowlist.
+
+- Set the `ALLOWUSERS` environment variable to the path of a JSON file listing allowed email addresses.
+- When unset: no restriction (any Google account can sign in, as before).
+- When set: only the listed addresses can sign in and use the APIs. Any other address is rejected at sign-in.
+- Addresses are normalized with trim + lowercasing before comparison.
+- Fail-closed: if the file is missing, unreadable, or contains broken JSON, everyone is rejected.
+- New sign-ins are blocked in the `signIn` callback, and existing sessions are blocked with 403 in every API route.
+- The file is reloaded when its mtime changes, so no restart is needed after editing.
+
+```bash
+# Add to .env.local
+ALLOWUSERS=/git-repos/allowusers.json
+```
+
+JSON format (a plain array, or an object with a `users` / `allowedUsers` / `allowUsers` / `emails` key):
+
+```json
+[
+  "you@example.com",
+  "family@example.com"
+]
+```
+
+```json
+{ "users": ["you@example.com"] }
+```
+
+Setup example:
+
+```bash
+cat > /git-repos/allowusers.json <<EOF
+[
+  "you@example.com"
+]
+EOF
+echo "ALLOWUSERS=/git-repos/allowusers.json" >> .env.local
+npm run build
+```
+
+Note: `allowusers.json` in this repository is only a dummy sample (contains `your-email@gmail.com`). Replace it with your real address before use. If you do not want to push real addresses to Git, consider adding it to `.gitignore` or deploying it only on the server.
+
 ## Docker
 
 It's easy to build with Docker.
