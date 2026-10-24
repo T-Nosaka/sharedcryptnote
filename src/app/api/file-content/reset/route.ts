@@ -38,8 +38,10 @@ export async function POST(req: NextRequest) {
     }
 
     // セキュリティチェック: ルートディレクトリより上を参照しないようにする
-    const absoluteFilePath = path.join(gitinfo.baseDir(), selectFilePath);
-    if (!absoluteFilePath.startsWith(gitinfo.baseDir())) {
+    // path.resolve で正規化してから比較する（.. による脱出と sibling prefix 攻撃を防ぐ）
+    const baseDir = path.resolve(gitinfo.baseDir());
+    const absoluteFilePath = path.resolve(baseDir, selectFilePath);
+    if (absoluteFilePath !== baseDir && !absoluteFilePath.startsWith(baseDir + path.sep)) {
       return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
     }
 
