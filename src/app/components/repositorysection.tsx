@@ -91,7 +91,7 @@ export function RepositorySection({
                   type="text"
                   value={repoName}
                   onChange={(e) => setRepoName(e.target.value)}
-                  placeholder="リポジリ名Lを入力"
+                  placeholder="リポジリ名を入力"
                   className="w-full p-2 border border-gray-600 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={loading}
                 />

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import path from 'path';
 
-import { encryptExtensions, supportedEncodings } from '../utils/constants';
+import { encryptExtensions, supportedEncodings, getPasswordMinLength } from '../utils/constants';
 import { CheckoutFileMode } from '@/hooks/handleGitCheckoutfile';
 import FileLogModal from './filelogmodal'; // モーダルコンポーネントをインポート
 import { DefaultLogFields } from 'simple-git';
@@ -247,8 +247,8 @@ export function FileListContents({
                           { entry.isDirectory == false ? (
                               isChiFile(entry) ? (
                           <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                  disabled={loading || password.length < 8}
-                                  title={ password.length < 8 ? "パスワードを入力して下さい":`${entry.name}を復号化`}
+                                  disabled={loading || password.length < getPasswordMinLength()}
+                                  title={ password.length < getPasswordMinLength() ? "パスワードを入力して下さい":`${entry.name}を復号化`}
                                   onClick={() => {
                                       handleDecrypt( selectRepo,currentPath,entry.name,password);
                                       setSearchmode(false);
@@ -257,8 +257,8 @@ export function FileListContents({
                               🔓
                           </button>):(
                           <button className="ml-2 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                  disabled={loading || password.length < 8}
-                                  title={ password.length < 8 ? "パスワードを入力して下さい":`${entry.name}を暗号化`}
+                                  disabled={loading || password.length < getPasswordMinLength()}
+                                  title={ password.length < getPasswordMinLength() ? "パスワードを入力して下さい":`${entry.name}を暗号化`}
                                   onClick={() =>{
                                       handleEncrypt( selectRepo,currentPath,entry.name,password);
                                       setSearchmode(false);
@@ -385,16 +385,16 @@ export function FileListContents({
                               { entry.isDirectory == false ? (
                                   isChiFile(entry) ? (
                               <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                      disabled={loading || password.length < 8}
-                                      title={ password.length < 8 ? "パスワードを入力して下さい":`${entry.name}を復号化`}
+                                      disabled={loading || password.length < getPasswordMinLength()}
+                                      title={ password.length < getPasswordMinLength() ? "パスワードを入力して下さい":`${entry.name}を復号化`}
                                       onClick={() => {
                                           handleDecrypt( selectRepo,currentPath,entry.name,password);
                                           }}>
                                   🔓
                               </button>):(
                               <button className="ml-2 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                      disabled={loading || password.length < 8}
-                                      title={ password.length < 8 ? "パスワードを入力して下さい":`${entry.name}を暗号化`}
+                                      disabled={loading || password.length < getPasswordMinLength()}
+                                      title={ password.length < getPasswordMinLength() ? "パスワードを入力して下さい":`${entry.name}を暗号化`}
                                       onClick={() =>{
                                           handleEncrypt( selectRepo,currentPath,entry.name,password);
                                           }}>

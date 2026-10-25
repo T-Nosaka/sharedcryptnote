@@ -51,3 +51,17 @@ export function resolveWriteMode(mode: unknown): SncWriteMode {
 export function isAsciiPassword(pw: string): boolean {
   return /^[\x20-\x7E]*$/.test(pw);
 }
+
+// Minimum password length, configurable via env. Hard floor 4, default 8, cap 64.
+// Server reads CRYPTO_PASSWORD_MIN_LENGTH at runtime; browser bundle reads
+// NEXT_PUBLIC_CRYPTO_PASSWORD_MIN_LENGTH at build time. Set both to the same value.
+export function getPasswordMinLength(): number {
+  const raw = (typeof process !== 'undefined'
+    ? (process.env.CRYPTO_PASSWORD_MIN_LENGTH
+      ?? process.env.NEXT_PUBLIC_CRYPTO_PASSWORD_MIN_LENGTH
+      ?? '8')
+    : '8');
+  const n = parseInt(String(raw).trim(), 10);
+  if (!Number.isFinite(n)) return 8;
+  return Math.min(64, Math.max(4, Math.floor(n)));
+}

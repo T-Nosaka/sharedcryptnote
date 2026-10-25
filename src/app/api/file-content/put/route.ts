@@ -8,7 +8,7 @@ import fs from 'fs/promises';
 import { DEFAULTENCODE, encryptExtensions } from "@/app/utils/constants";
 import { TomboCrypt } from "../tombo_crypto";
 import { SncCrypt } from "../snc_crypto";
-import { resolveWriteMode, isAsciiPassword } from "@/app/utils/constants";
+import { resolveWriteMode, isAsciiPassword, getPasswordMinLength } from "@/app/utils/constants";
 import * as Encoding from 'encoding-japanese';
 import * as fsa from 'fs';
 
@@ -63,11 +63,12 @@ export async function POST(req: NextRequest) {
     }
 
     if (fileExtension && encryptExtensions.includes((fileExtension as string).toLowerCase())) {
-      if (!password || (password as string).length < 8) {
-        return NextResponse.json({ error: 'password is required. need password length 8 characters or more.' }, { status: 400 });
+      const minPw = getPasswordMinLength();
+      if (!password || (password as string).length < minPw) {
+        return NextResponse.json({ error: `password is required. need password length ${minPw} characters or more.` }, { status: 400 });
       }
       if (typeof password !== 'string' || !isAsciiPassword(password)) {
-        return NextResponse.json({ error: 'password must be ASCII printable characters (8 or more).' }, { status: 400 });
+        return NextResponse.json({ error: `password must be ASCII printable characters (${minPw} or more).` }, { status: 400 });
       }
     }
     const writeMode = resolveWriteMode(mode);

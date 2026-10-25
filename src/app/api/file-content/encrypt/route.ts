@@ -8,7 +8,7 @@ import fs from 'fs/promises';
 import * as fsa from 'fs';
 import { TomboCrypt } from "@/app/api/file-content/tombo_crypto";
 import { SncCrypt } from "@/app/api/file-content/snc_crypto";
-import { resolveWriteMode, isAsciiPassword } from "@/app/utils/constants";
+import { resolveWriteMode, isAsciiPassword, getPasswordMinLength } from "@/app/utils/constants";
 import { textExtensions } from "@/app/utils/constants";
 
 /**
@@ -39,11 +39,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'gitinfostr is required' }, { status: 400 });
     }
 
-    if (!password || password.length < 8) {
-      return NextResponse.json({ error: 'password is required. need password length 8 characters or more.' }, { status: 400 });
+    const minPw = getPasswordMinLength();
+    if (!password || password.length < minPw) {
+      return NextResponse.json({ error: `password is required. need password length ${minPw} characters or more.` }, { status: 400 });
     }
     if (typeof password !== 'string' || !isAsciiPassword(password)) {
-      return NextResponse.json({ error: 'password must be ASCII printable characters (8 or more).' }, { status: 400 });
+      return NextResponse.json({ error: `password must be ASCII printable characters (${minPw} or more).` }, { status: 400 });
     }
     const writeMode = resolveWriteMode(mode);
 

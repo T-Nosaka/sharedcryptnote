@@ -132,11 +132,14 @@ Per-request `mode` (`encrypt` / `put`) overrides it. Invalid values fall back to
 CRYPTO_DEFAULT_MODE=snc1
 ```
 
-### Password policy (all 4 routes)
+### Password policy (all 4 routes, encryption and decryption)
 
-- Minimum 8 characters (`encrypt` / `decrypt` / `get` / `put`, encryption and decryption).
+- Minimum length via env: `CRYPTO_PASSWORD_MIN_LENGTH` (server, runtime) and `NEXT_PUBLIC_CRYPTO_PASSWORD_MIN_LENGTH` (browser, build time). Set both to the same value.
+- Hard floor 4, default 8, cap 64. Out-of-range or invalid values fall back (`<4` -> `4`, `>64` -> `64`, unparsable -> `8`).
+- Example: existing 4-char passwords keep working with `CRYPTO_PASSWORD_MIN_LENGTH=4` + `NEXT_PUBLIC_CRYPTO_PASSWORD_MIN_LENGTH=4` (dev `.env.local` is set this way). New deployments should use `8` or higher.
+- NOTE: changing `NEXT_PUBLIC_*` requires `npm run build` (it is inlined at build time).
 - Printable ASCII only: `^[\x20-\x7E]*$`. Full-width / non-ASCII (e.g. JA chars, e-acute) is rejected with 400.
-- UI (`filelistcontents.tsx`) also enforces 8+ characters.
+- UI (`filelistcontents.tsx`) enforces the same minimum via `getPasswordMinLength()`.
 
 ### API
 
