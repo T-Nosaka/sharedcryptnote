@@ -7,6 +7,8 @@ import path from "path";
 import fs from 'fs/promises';
 import * as fsa from 'fs';
 import { TomboCrypt } from "@/app/api/file-content/tombo_crypto";
+import { SncCrypt } from "@/app/api/file-content/snc_crypto";
+import { resolveWriteMode, isAsciiPassword } from "@/app/utils/constants";
 import { textExtensions } from "@/app/utils/constants";
 
 /**
@@ -17,7 +19,7 @@ import { textExtensions } from "@/app/utils/constants";
 export async function POST(req: NextRequest) {
   try {
 
-    const { gitinfostr, selectFilePath, password } = await req.json();
+    const { gitinfostr, selectFilePath, password, mode } = await req.json();
 
     const session = await getServerSession(authOptions);
 
@@ -40,6 +42,10 @@ export async function POST(req: NextRequest) {
     if (!password || password.length < 8) {
       return NextResponse.json({ error: 'password is required. need password length 8 characters or more.' }, { status: 400 });
     }
+    if (typeof password !== 'string' || !isAsciiPassword(password)) {
+      return NextResponse.json({ error: 'password must be ASCII printable characters (8 or more).' }, { status: 400 });
+    }
+    const writeMode = resolveWriteMode(mode);
 
     //ユーザー取得
     const userinfo : UserInfo = session.user.info;
@@ -69,13 +75,18 @@ export async function POST(req: NextRequest) {
         //拡張子変更
         const newFilePath = absoluteFilePath.slice(0, -fileExtension.length) + '.chi';
 
-        // Tombo暗号
-        const crypto = new TomboCrypt();
-        const psword = new TextEncoder().encode(password);
-        const passcode = TomboCrypt.passcode(psword);
-
+        // SNC1 / BF01 (Phase1: default SNC1, magic-based read)
         const contents = fsa.readFileSync(absoluteFilePath);
-        const crypted = await crypto.encode(passcode, contents);
+        let crypted: Uint8Array;
+        if (writeMode === 'bf01') {
+          const crypto = new TomboCrypt();
+          const psword = new TextEncoder().encode(password);
+          const passcode = TomboCrypt.passcode(psword);
+          crypted = await crypto.encode(passcode, contents);
+        } else {
+          const pwBytes = new TextEncoder().encode(password);
+          crypted = SncCrypt.encrypt(pwBytes, new Uint8Array(contents));
+        }
         await fsa.writeFileSync(newFilePath,crypted);
 
         //File delete
@@ -88,7 +99,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Failed from encrypted file' }, { status: 400 });
     }
 
-    return NextResponse.json({ message: 'File encrypted successfully' }, { status: 200 });
+    return NextResponse.json({ message: 'File encrypted successfully', mode: writeMode }, { status: 200 });
   } catch (error ) {
     console.error('Error reading file:', error);
     return NextResponse.json({ error: 'Failed to read file content' }, { status: 500 });

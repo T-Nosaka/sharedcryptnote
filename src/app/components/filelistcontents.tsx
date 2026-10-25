@@ -247,8 +247,8 @@ export function FileListContents({
                           { entry.isDirectory == false ? (
                               isChiFile(entry) ? (
                           <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                  disabled={loading || password.length < 5}
-                                  title={ password.length < 5 ? "パスワードを入力して下さい":`${entry.name}を復号化`}
+                                  disabled={loading || password.length < 8}
+                                  title={ password.length < 8 ? "パスワードを入力して下さい":`${entry.name}を復号化`}
                                   onClick={() => {
                                       handleDecrypt( selectRepo,currentPath,entry.name,password);
                                       setSearchmode(false);
@@ -257,8 +257,8 @@ export function FileListContents({
                               🔓
                           </button>):(
                           <button className="ml-2 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                  disabled={loading || password.length < 5}
-                                  title={ password.length < 5 ? "パスワードを入力して下さい":`${entry.name}を暗号化`}
+                                  disabled={loading || password.length < 8}
+                                  title={ password.length < 8 ? "パスワードを入力して下さい":`${entry.name}を暗号化`}
                                   onClick={() =>{
                                       handleEncrypt( selectRepo,currentPath,entry.name,password);
                                       setSearchmode(false);
@@ -385,16 +385,16 @@ export function FileListContents({
                               { entry.isDirectory == false ? (
                                   isChiFile(entry) ? (
                               <button className="ml-1 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                      disabled={loading || password.length < 5}
-                                      title={ password.length < 5 ? "パスワードを入力して下さい":`${entry.name}を復号化`}
+                                      disabled={loading || password.length < 8}
+                                      title={ password.length < 8 ? "パスワードを入力して下さい":`${entry.name}を復号化`}
                                       onClick={() => {
                                           handleDecrypt( selectRepo,currentPath,entry.name,password);
                                           }}>
                                   🔓
                               </button>):(
                               <button className="ml-2 text-yellow-400 disabled:bg-gray-700 justify-end" 
-                                      disabled={loading || password.length < 5}
-                                      title={ password.length < 5 ? "パスワードを入力して下さい":`${entry.name}を暗号化`}
+                                      disabled={loading || password.length < 8}
+                                      title={ password.length < 8 ? "パスワードを入力して下さい":`${entry.name}を暗号化`}
                                       onClick={() =>{
                                           handleEncrypt( selectRepo,currentPath,entry.name,password);
                                           }}>

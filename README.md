@@ -1,6 +1,6 @@
 
 ## SharedCryptNote
-SharedCryptNote is a secure, web-based encrypted note-taking application. It uses the Blowfish encryption algorithm to securely store your notes and manages them efficiently within a file system. It is also compatible with the Android application "SharedKeyMemo," ensuring a seamless note-taking experience across your devices.
+SharedCryptNote is a secure, web-based encrypted note-taking application. It uses SNC1 (AES-256-GCM + scrypt) encryption by default, with legacy Blowfish (Tombo-compatible BF01) read support, to securely store your notes and manages them efficiently within a file system. It is also compatible with the Android application "SharedKeyMemo," ensuring a seamless note-taking experience across your devices.
 
 https://play.google.com/store/apps/details?id=org.dwmedia.sharedkeymemo
 
@@ -9,7 +9,7 @@ https://play.google.com/store/apps/details?id=org.dwmedia.sharedkeymemo
 ## Key Features
 Strong Encryption
 
-Uses the Blowfish algorithm to keep your notes safe and secure.
+Uses SNC1 (AES-256-GCM + scrypt) by default, with legacy BF01 (Blowfish, Tombo compatible) read support, to keep your notes safe and secure.
 
 Google Account Integration
 
@@ -26,7 +26,7 @@ Compatible with the Android app SharedKeyMemo, enabling you to share and edit th
 Tech Stack
 Frontend: Next.js
 
-Encryption: Blowfish
+Encryption: SNC1 (AES-256-GCM + scrypt, default) / BF01 legacy (Blowfish, Tombo compatible)
 
 Version Control: Git
 
@@ -90,6 +90,63 @@ npm run build
 ```
 
 Note: `allowusers.json` in this repository is only a dummy sample (contains `your-email@gmail.com`). Replace it with your real address before use. If you do not want to push real addresses to Git, consider adding it to `.gitignore` or deploying it only on the server.
+
+## Encryption (.chi: SNC1 / BF01 dual-format)
+
+`.chi` keeps its extension; the format is detected by the first 4 bytes (magic).
+
+- `SNC1` (`53 4E 43 31`): new format, default for writes.
+- `BF01` (`42 46 30 31`): legacy Tombo-compatible format, still readable.
+- `.txt` files are never magic-detected.
+
+### SNC1 layout
+
+```
+magic "SNC1" 4B | ver 0x01 1B | kdfId 0x01=scrypt 1B
+| N u32BE 4B (=16384) | r u32BE 4B (=8) | p u32BE 4B (=1)
+| salt 16B | nonce 12B | ciphertext (variable) | GCM tag 16B
+```
+
+- Header is 46B total and is used as AAD for AES-256-GCM.
+- Key: `scrypt(password, salt, N=16384, r=8, p=1, 32B, maxmem 32MB)` -> `AES-256-GCM` (256-bit key, 96-bit nonce).
+- Plaintext is the raw file bytes, same as the BF01 path.
+- `salt` / `nonce` use `randomBytes` (CSPRNG), so the same plaintext encrypts differently each time.
+- Tampering with the header, body, or tag fails decryption (returns invalid-password).
+
+### BF01 legacy (Tombo compatible)
+
+Blowfish-CBC with fixed IV `BLOWFISH`, MD5-based key (`MD5(password)`), MD5-embedded integrity check.
+Hardened in Phase0 (still legacy, use SNC1 for new files):
+
+- Random padding now uses `randomBytes(8)` (was `Math.random()`).
+- MD5 comparison uses `timingSafeEqual` (was non-constant-time compare).
+- Use `bf01` writes only when Android SharedKeyMemo / Tombo compatibility is required.
+
+### Write mode
+
+Default write mode is `CRYPTO_DEFAULT_MODE` (`snc1` | `bf01`, default `snc1`).
+Per-request `mode` (`encrypt` / `put`) overrides it. Invalid values fall back to `snc1`.
+
+```bash
+# Add to .env.local (default is snc1 when unset)
+CRYPTO_DEFAULT_MODE=snc1
+```
+
+### Password policy (all 4 routes)
+
+- Minimum 8 characters (`encrypt` / `decrypt` / `get` / `put`, encryption and decryption).
+- Printable ASCII only: `^[\x20-\x7E]*$`. Full-width / non-ASCII (e.g. JA chars, e-acute) is rejected with 400.
+- UI (`filelistcontents.tsx`) also enforces 8+ characters.
+
+### API
+
+- `POST /api/file-content/encrypt`, `PUT /api/file-content/put`: accept optional `mode: "snc1" | "bf01"`, respond with `mode` actually used.
+- `POST /api/file-content/get`, `POST /api/file-content/decrypt`: auto-detect by magic, respond with `enc: "snc1" | "bf01" | null`. Old clients ignore the extra field, so this is backward compatible.
+
+### UI
+
+- `.chi` editor header (`fileedit.tsx`) shows a badge only for encrypted files: green `SNC1` for new files, amber `BF01 (legacy)` for old files.
+- Implementation note: `src/app/api/file-content/snc_crypto.ts` is server-only (`node:crypto`). Shared settings (`SncWriteMode` / `getDefaultWriteMode` / `resolveWriteMode` / `isAsciiPassword`) live in `src/app/utils/constants.ts`.
 
 ## Docker
 

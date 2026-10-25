@@ -27,3 +27,27 @@ export const pathJoin = (base: string, part: string): string => {
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+// Phase1 crypto settings (.chi dual-format SNC1/BF01).
+export type SncWriteMode = 'snc1' | 'bf01';
+
+// Default write mode for .chi, configurable via env (snc1 | bf01).
+export function getDefaultWriteMode(): SncWriteMode {
+  const raw = (typeof process !== 'undefined' ? (process.env.CRYPTO_DEFAULT_MODE || 'snc1') : 'snc1');
+  const v = raw.trim().toLowerCase();
+  return v === 'bf01' ? 'bf01' : 'snc1';
+}
+
+// Per-request override (encrypt/put accept optional mode), falls back to env default.
+export function resolveWriteMode(mode: unknown): SncWriteMode {
+  if (typeof mode === 'string') {
+    const v = mode.trim().toLowerCase();
+    if (v === 'bf01' || v === 'snc1') return v;
+  }
+  return getDefaultWriteMode();
+}
+
+// Printable ASCII only (0x20-0x7E). Full-width and non-ASCII passwords are rejected.
+export function isAsciiPassword(pw: string): boolean {
+  return /^[\x20-\x7E]*$/.test(pw);
+}

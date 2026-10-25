@@ -8,6 +8,7 @@ import { Repo } from '../models/gitinfo';
  * ファイル編集
  */
 export function FileEditContents({
+  encFormat,
   loading,
   repo,
   editingFilePath,
@@ -19,6 +20,7 @@ export function FileEditContents({
   handleSaveFile,
   handleCancelEdit,
 }: {
+  encFormat?: string | null;
   loading: boolean;
   repo: Repo | undefined;
   editingFilePath: string;
@@ -63,7 +65,13 @@ export function FileEditContents({
 
         <span className="text-white">
           {editingFilePath}
-        </span>                
+        </span>
+        {editingFilePath?.toLowerCase().endsWith('.chi') && encFormat === 'snc1' && (
+          <span className="ml-2 px-2 py-0.5 text-xs rounded bg-green-700 text-white">SNC1</span>
+        )}
+        {editingFilePath?.toLowerCase().endsWith('.chi') && encFormat === 'bf01' && (
+          <span className="ml-2 px-2 py-0.5 text-xs rounded bg-amber-700 text-white">BF01 (legacy)</span>
+        )}                
 
         <div className="mt-4 p-0 border border-gray-700 rounded-lg w-full sm:max-w-xl bg-gray-800 shadow-lg" style={{maxWidth:600}}>
 

@@ -63,6 +63,7 @@ export default function Home() {
   const [gitStatusBehind, setGitStatusBehind] = useState<number>(0);
   const [commitmessage, setCommitMessage] = useState<string>('');
   const [newFileName, setNewFileName] = useState<string>('');
+  const [encFormat, setEncFormat] = useState<string|null>(null);
   const [gitBranch, setGitBranch] = useState<string>('');
   const [loglist, setLoglist] = useState<ReadonlyArray<DefaultLogFields>|undefined>(undefined);
   const [logdiffresult, setLogdiffResult] = useState<DiffResult|undefined>(undefined);
@@ -125,10 +126,11 @@ export default function Home() {
     if (fileExtension && editableExtensions.includes(fileExtension.toLowerCase())) {
       if (selectRepo) {
         setSelectedFileContent(''); // 編集開始時は内容をクリア
-        handleFileGet(selectRepo,fileEncoding,relativeFilePath,fileExtension,password,setMessage,setLoading, (contents) => {
+        handleFileGet(selectRepo,fileEncoding,relativeFilePath,fileExtension,password,setMessage,setLoading, (contents, enc) => {
           setEditingFilePath(relativeFilePath);
           console.log('File contents:', contents) ;
           setSelectedFileContent(contents);
+          setEncFormat(enc ?? null);
         });
       }
 
@@ -147,6 +149,7 @@ export default function Home() {
   const handleSaveFile = useHandleFilePut(setMessage,setLoading,() => {
     setEditingFilePath(undefined);
     setSelectedFileContent('');
+    setEncFormat(null);
     setMessage('保存しました。');
     if(selectRepo)
       handleGitStatus(selectRepo);
@@ -154,6 +157,7 @@ export default function Home() {
   const handleCancelEdit = () => {
     setEditingFilePath(undefined);
     setSelectedFileContent('');
+    setEncFormat(null);
     setMessage('編集をキャンセルしました。');
   };
   const handleSetEncode = useHandleSetEncode(setMessage,(encoding) => {
@@ -313,6 +317,7 @@ export default function Home() {
                       setSelectedFileContent={setSelectedFileContent}
                       handleSaveFile={handleSaveFile}
                       handleCancelEdit={handleCancelEdit}
+                      encFormat={encFormat}
                     />
                   </div>
 

@@ -8,6 +8,8 @@ import fs from 'fs/promises';
 import { DEFAULTENCODE, encryptExtensions } from "@/app/utils/constants";
 import * as fsa from 'fs';
 import { TomboCrypt } from "../tombo_crypto";
+import { SncCrypt, isSnc1Data } from "../snc_crypto";
+import { isAsciiPassword } from "@/app/utils/constants";
 
 /**
  * ファイルの内容を読み込む
@@ -58,18 +60,30 @@ export async function POST(req: NextRequest) {
       if (!password || (password as string).length < 8) {
         return NextResponse.json({ error: 'password is required. need password length 8 characters or more.' }, { status: 400 });
       }
+      if (typeof password !== 'string' || !isAsciiPassword(password)) {
+        return NextResponse.json({ error: 'password must be ASCII printable characters (8 or more).' }, { status: 400 });
+      }
     }
 
     let content = ""
+    let enc: 'snc1' | 'bf01' | null = null
     if (fileExtension && encryptExtensions.includes(fileExtension.toLowerCase())) {
-      // Tombo暗号
+      // SNC1 / BF01 auto-detect (Phase1: magic-based)
       const encrypted = fsa.readFileSync(absoluteFilePath);
+      const rawEnc = new Uint8Array(encrypted);
 
-      const crypto = new TomboCrypt();
-      const psword = new TextEncoder().encode(password);
-      const passcode = TomboCrypt.passcode(psword);
-
-      const decrypted = await crypto.decode(passcode, encrypted);
+      let decrypted: Uint8Array | null = null;
+      if (isSnc1Data(rawEnc)) {
+        const pwBytes = new TextEncoder().encode(password);
+        decrypted = SncCrypt.decrypt(pwBytes, rawEnc);
+        enc = 'snc1';
+      } else {
+        const crypto = new TomboCrypt();
+        const psword = new TextEncoder().encode(password);
+        const passcode = TomboCrypt.passcode(psword);
+        decrypted = await crypto.decode(passcode, encrypted);
+        enc = 'bf01';
+      }
       if (decrypted) {
         // 指定された文字コードでファイルの内容を読み込む
         if (fileEncoding == DEFAULTENCODE) {
@@ -92,7 +106,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ content });
+    return NextResponse.json({ content, enc });
   } catch (error ) {
     console.error('Error reading file:', error);
     return NextResponse.json({ error: 'Failed to read file content' }, { status: 500 });

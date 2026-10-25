@@ -7,7 +7,7 @@ export async function handleFileGet(
     password: string,
     setMessage: (str: string) => void,
     setLoading: (status: boolean) => void,
-    callback?: (contents:string) => void) {
+    callback?: (contents:string, enc?: string | null) => void) {
     try {
         setLoading(true);
         const response = await fetch('/api/file-content/get', {
@@ -18,7 +18,7 @@ export async function handleFileGet(
         const data = await response.json();
         if (response.ok) {
             if (callback)
-                callback(data.content);            
+                callback(data.content, (data as { enc?: string | null }).enc ?? null);            
         } else {
             setMessage(`Error: ${data.error}`);
         }
