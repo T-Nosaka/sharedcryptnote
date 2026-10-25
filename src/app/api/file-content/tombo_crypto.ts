@@ -8,6 +8,7 @@ type u32 = number;
 type byte = number;
 
 import { MD5 } from './md5';
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 
 interface BlowfishContext {
   s0: u32[];
@@ -507,10 +508,8 @@ export class TomboCrypt {
     
     const pBuf = output.subarray(8);
     
-    // Random padding
-    for (let i = 0; i < 8; i++) {
-      pBuf[i] = Math.floor(Math.random() * 256);
-    }
+    // Random padding (Phase0: CSPRNG)
+    pBuf.set(randomBytes(8), 0);
     
     // MD5 hash of input data
     const md5Hash = MD5.getMD5Sum(input);
@@ -584,15 +583,16 @@ export class TomboCrypt {
       n -= 8;
     }
     
-    // Verify MD5 hash
+    // Verify MD5 hash (Phase0: constant-time compare)
     const outputData = output.subarray(24, 24 + nDataSize);
-    const decryptedHash = output.subarray(0, 24);
+    const storedHash = output.subarray(8, 24);
     const computedHash = MD5.getMD5Sum(outputData);
 
-    for (let i = 0; i < 16; i++) {
-        if (decryptedHash[16 + i-8] != computedHash[i]) {
-            return null; // Invalid hash
-        }
+    if (
+      storedHash.length !== computedHash.length ||
+      !timingSafeEqual(Buffer.from(storedHash), Buffer.from(computedHash))
+    ) {
+      return null; // Invalid hash
     }
 
     // Return only the actual data

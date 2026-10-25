@@ -60,6 +60,12 @@ export async function POST(req: NextRequest) {
       await fs.mkdir(dir, { recursive: true });
     }
 
+    if (fileExtension && encryptExtensions.includes((fileExtension as string).toLowerCase())) {
+      if (!password || (password as string).length < 8) {
+        return NextResponse.json({ error: 'password is required. need password length 8 characters or more.' }, { status: 400 });
+      }
+    }
+
     if (fileExtension && encryptExtensions.includes(fileExtension.toLowerCase())) {
       //暗号
       const crypto = new TomboCrypt();

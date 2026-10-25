@@ -37,8 +37,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'gitinfostr is required' }, { status: 400 });
     }
 
-    if (!password || password.length < 5) {
-      return NextResponse.json({ error: 'password is required. need password length 5 word.' }, { status: 400 });
+    if (!password || password.length < 8) {
+      return NextResponse.json({ error: 'password is required. need password length 8 characters or more.' }, { status: 400 });
     }
 
     //ユーザー取得

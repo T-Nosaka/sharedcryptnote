@@ -54,6 +54,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Path is not a file' }, { status: 400 });
     }
 
+    if (fileExtension && encryptExtensions.includes((fileExtension as string).toLowerCase())) {
+      if (!password || (password as string).length < 8) {
+        return NextResponse.json({ error: 'password is required. need password length 8 characters or more.' }, { status: 400 });
+      }
+    }
+
     let content = ""
     if (fileExtension && encryptExtensions.includes(fileExtension.toLowerCase())) {
       // Tombo暗号
